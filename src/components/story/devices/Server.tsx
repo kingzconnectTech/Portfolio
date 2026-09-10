@@ -4,6 +4,7 @@ import { RoundedBox, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { useStoryMaterials, storyColors } from '../materials'
+import { normalizeGltfScene } from '../normalizeGltf'
 
 type NodeStatus = 'on' | 'off' | 'warn'
 
@@ -27,14 +28,13 @@ export function RealisticServerRack({
     loader.load(
       '/models/server.glb',
       (gltf) => {
-        const clonedScene = gltf.scene.clone()
-        clonedScene.traverse((obj) => {
-          if (obj instanceof THREE.Mesh) {
-            obj.castShadow = true
-            obj.receiveShadow = true
-          }
-        })
-        setModel(clonedScene)
+        setModel(
+          normalizeGltfScene(gltf.scene, {
+            targetSize: 0.55,
+            ground: true,
+            centerXZ: true,
+          }),
+        )
       },
       undefined,
       (error) => {
@@ -62,20 +62,15 @@ export function RealisticServerRack({
     <group scale={scale}>
       <primitive object={model} />
 
-      <group position={[0.38, 0.1, 0.318]}>
-        {[-0.08, 0, 0.08].map((y, i) => (
-          <group key={i} position={[0, y, 0]}>
-            <mesh material={i === 0 ? led : mats.ledOn}>
-              <circleGeometry args={[0.006, 16]} />
-            </mesh>
-            <mesh position={[0, 0, 0.004]} material={mats.anodizedDark}>
-              <circleGeometry args={[0.008, 16]} />
-            </mesh>
-          </group>
+      <group position={[0.22, 0.18, 0.2]}>
+        {[-0.04, 0, 0.04].map((y, i) => (
+          <mesh key={i} position={[0, y, 0]} material={i === 0 ? led : mats.ledOn}>
+            <sphereGeometry args={[0.008, 12, 12]} />
+          </mesh>
         ))}
       </group>
 
-      <Html position={[0.58, 0.05, 0]} style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+      <Html position={[0.38, 0.2, 0]} style={{ pointerEvents: 'none', whiteSpace: 'nowrap' }}>
         <span
           style={{
             color: storyColors.cream,

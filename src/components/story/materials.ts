@@ -24,6 +24,8 @@ export const storyColors = {
 }
 
 type StoryMats = {
+  charcoal: THREE.MeshStandardMaterial
+  metal: THREE.MeshStandardMaterial
   anodized: THREE.MeshStandardMaterial
   anodizedDark: THREE.MeshStandardMaterial
   metalFine: THREE.MeshStandardMaterial
@@ -47,6 +49,16 @@ let cache: StoryMats | null = null
 
 function createMaterials(): StoryMats {
   return {
+    charcoal: new THREE.MeshStandardMaterial({
+      color: storyColors.charcoal,
+      roughness: 0.72,
+      metalness: 0.08,
+    }),
+    metal: new THREE.MeshStandardMaterial({
+      color: '#3a3a3a',
+      roughness: 0.35,
+      metalness: 0.75,
+    }),
     anodized: new THREE.MeshStandardMaterial({
       color: storyColors.anodized,
       roughness: 0.32,

@@ -16,7 +16,7 @@ export function StoryCanvas() {
         powerPreference: isMobile ? 'low-power' : 'high-performance',
       }}
       shadows={!isMobile}
-      camera={{ position: [0, 1.4, 5.5], fov: isMobile ? 50 : 42, near: 0.1, far: 40 }}
+      camera={{ position: [0, 1.35, 3.8], fov: isMobile ? 40 : 36, near: 0.05, far: 50 }}
       style={{ background: '#0c0c0c' }}
     >
       <Suspense fallback={null}>

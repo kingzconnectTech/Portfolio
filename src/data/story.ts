@@ -4,28 +4,11 @@ export type StoryChapter = {
   id: string
   number: string
   title: string
-  /** Short lines shown beside the scene — keep editorial and sparse */
-  lines: string[]
-  visual: string
+  subtitle?: string
+  /** Short narrative text */
+  content: string[]
   /** Progress window [start, end] within 0–1 scroll journey */
   range: [number, number]
-}
-
-export const storyMeta = {
-  title: 'THE MAKING\nOF A BUILDER',
-  subtitle: 'A story told through things built.',
-  scrollHint: 'SCROLL TO EXPLORE',
-  supporting: [
-    'Ideas became experiments.',
-    'Experiments became products.',
-    'Products became a craft.',
-  ],
-  final: {
-    lines: ['Still learning.', 'Still building.', 'Still solving.'],
-    brand: 'KINGZCONNECT',
-    statement: ['Built with curiosity.', 'Driven by problems.', 'Defined by what gets built.'],
-    cta: 'BACK TO HOME',
-  },
 }
 
 export const storyChapters: StoryChapter[] = [
@@ -33,104 +16,197 @@ export const storyChapters: StoryChapter[] = [
     id: 'intro',
     number: '00',
     title: 'INTRO',
-    lines: [],
-    visual: 'void',
-    range: [0, 0.06],
+    content: [],
+    range: [0, 0.08],
+  },
+  {
+    id: 'before-code',
+    number: '01',
+    title: 'BEFORE THE CODE',
+    subtitle: 'WHERE IT BEGAN',
+    content: [
+      'Every builder starts somewhere.',
+      'Before the frameworks, APIs, databases and deployments,',
+      'there was curiosity.',
+      'The desire to understand how things worked.',
+      'And eventually, the desire to build them.',
+      '[ADD YOUR PERSONAL STORY HERE]',
+    ],
+    range: [0.08, 0.18],
   },
   {
     id: 'curiosity',
-    number: '01',
-    title: 'CURIOSITY',
-    lines: [
-      'It started with a simple question:',
-      '“How does this work?”',
-      'Curiosity became experimentation.',
+    number: '02',
+    title: 'THE CURIOSITY',
+    subtitle: 'HOW IT STARTED',
+    content: [
+      'Curiosity became the driver.',
+      'Each question led to exploration.',
+      'Each exploration led to understanding.',
+      'The journey from observer to creator.',
     ],
-    visual: 'laptop',
-    range: [0.06, 0.15],
+    range: [0.18, 0.28],
   },
   {
     id: 'learning',
-    number: '02',
-    title: 'LEARNING',
-    lines: ['Every project became another lesson.'],
-    visual: 'code',
-    range: [0.15, 0.24],
-  },
-  {
-    id: 'experimentation',
     number: '03',
-    title: 'EXPERIMENTATION',
-    lines: ['Build it.', 'Break it.', 'Understand why.', 'Build it better.'],
-    visual: 'workspace',
-    range: [0.24, 0.33],
+    title: 'LEARNING BY BUILDING',
+    subtitle: 'THE PROCESS',
+    content: [
+      'The transition from learning technology to actually creating things.',
+      'Understanding tools through application.',
+      'Breaking things to understand how they work.',
+      'Building ideas into working products.',
+    ],
+    range: [0.28, 0.38],
   },
   {
-    id: 'web',
+    id: 'projects',
     number: '04',
-    title: 'THE WEB',
-    lines: [
-      'Interfaces became more than screens.',
-      'They became experiences.',
+    title: 'FROM PROJECTS TO PRODUCTS',
+    subtitle: 'THE WORK',
+    content: [
+      'Ideas become useful when they become real.',
+      'Putting work in front of real people.',
+      'Listening, measuring, refining, repeating.',
+      'The evolution from experiments to products.',
     ],
-    visual: 'browser',
-    range: [0.33, 0.42],
+    range: [0.38, 0.48],
   },
   {
-    id: 'mobile',
+    id: 'behind-screen',
     number: '05',
-    title: 'MOBILE',
-    lines: ['The same ideas.', 'A different canvas.'],
-    visual: 'phone',
-    range: [0.42, 0.51],
-  },
-  {
-    id: 'systems',
-    number: '06',
-    title: 'SYSTEMS',
-    lines: [
-      'Building the interface is only part of the problem.',
-      'The system behind it has to work.',
+    title: 'BEHIND THE SCREEN',
+    subtitle: 'THE TOOLS',
+    content: [
+      'The workspace where ideas become reality.',
+      'Each tool serves a purpose.',
+      'Each object has a story.',
+      'Technology as the medium for creation.',
     ],
-    visual: 'systems',
-    range: [0.51, 0.6],
+    range: [0.48, 0.58],
   },
   {
-    id: 'problem-solving',
+    id: 'thinking',
+    number: '06',
+    title: 'HOW I THINK',
+    subtitle: 'THE MINDSET',
+    content: [
+      'The principles that guide the work.',
+      'Understanding before solving.',
+      'Simplifying complexity.',
+      'Building ideas into reality.',
+      'Iterating toward excellence.',
+    ],
+    range: [0.58, 0.68],
+  },
+  {
+    id: 'capabilities',
     number: '07',
-    title: 'PROBLEM SOLVING',
-    lines: ['Bugs.', 'Broken APIs.', 'Unexpected behaviour.', 'solve it.'],
-    visual: 'puzzle',
-    range: [0.6, 0.69],
-  },
-  {
-    id: 'building',
-    number: '08',
-    title: 'BUILDING REAL THINGS',
-    lines: ['Work that left the studio.', 'And entered the world.'],
-    visual: 'projects',
-    range: [0.69, 0.78],
-  },
-  {
-    id: 'toolbox',
-    number: '09',
-    title: 'THE TOOLBOX',
-    lines: ['Tools chosen with intent.', 'Not collected for display.'],
-    visual: 'toolbox',
-    range: [0.78, 0.87],
+    title: 'WHAT I BUILD',
+    subtitle: 'THE CAPABILITIES',
+    content: [
+      'The areas where expertise has developed.',
+      'Digital experiences and applications.',
+      'Systems and infrastructure.',
+      'End-to-end digital products.',
+    ],
+    range: [0.68, 0.78],
   },
   {
     id: 'today',
-    number: '10',
+    number: '08',
     title: 'TODAY',
-    lines: storyMeta.final.lines,
-    visual: 'today',
-    range: [0.87, 1],
+    subtitle: 'THE CONTINUING JOURNEY',
+    content: [
+      'Still learning.',
+      'Still building.',
+      'Still solving.',
+      'The story is still being written.',
+    ],
+    range: [0.78, 0.88],
   },
 ]
 
+export const storyPrinciples = [
+  {
+    number: '01',
+    title: 'UNDERSTAND',
+    description: 'Understand the problem before solving it.',
+  },
+  {
+    number: '02',
+    title: 'SIMPLIFY',
+    description: 'Good technology should make things clearer, not more complicated.',
+  },
+  {
+    number: '03',
+    title: 'BUILD',
+    description: 'Ideas become useful when they become real.',
+  },
+  {
+    number: '04',
+    title: 'ITERATE',
+    description: 'The first version is rarely the final version.',
+  },
+]
+
+export const storyCapabilities = [
+  {
+    category: 'DIGITAL EXPERIENCES',
+    description: 'Websites, interfaces, interactive experiences.',
+  },
+  {
+    category: 'APPLICATIONS',
+    description: 'Web apps and mobile applications.',
+  },
+  {
+    category: 'SYSTEMS',
+    description: 'APIs, databases, authentication, backend infrastructure.',
+  },
+  {
+    category: 'PRODUCTS',
+    description: 'End-to-end digital products.',
+  },
+]
+
+export const storyTechnologies = [
+  { name: 'React', description: 'Interactive interfaces, Web applications, Component architecture' },
+  { name: 'React Native', description: 'Cross-platform mobile applications' },
+  { name: 'JavaScript', description: 'Dynamic web experiences' },
+  { name: 'TypeScript', description: 'Type-safe development' },
+  { name: 'Node.js', description: 'Backend services and APIs' },
+  { name: 'Python', description: 'Data processing and automation' },
+  { name: 'MongoDB', description: 'NoSQL database architecture' },
+  { name: 'MySQL', description: 'Relational database systems' },
+  { name: 'Firebase', description: 'Real-time data and authentication' },
+  { name: 'AWS', description: 'Cloud infrastructure and deployment' },
+  { name: 'Shopify', description: 'E-commerce platforms' },
+  { name: 'WordPress', description: 'Content management systems' },
+  { name: 'Git', description: 'Version control and collaboration' },
+]
+
+export const storyFinal = {
+  headline: 'TODAY',
+  lines: ['STILL LEARNING.', 'STILL BUILDING.', 'STILL SOLVING.'],
+  brand: 'KINGZCONNECT',
+  role: 'Developer. Builder. Problem Solver.',
+  closing: 'THE STORY IS STILL BEING WRITTEN.',
+  cta1: 'EXPLORE PROJECTS',
+  cta2: 'BACK TO HOME',
+}
+
 /** Navigable chapter markers (exclude intro void) */
 export const storyNavChapters = storyChapters.filter((c) => c.id !== 'intro')
+
+export const storyProjects = projects
+
+export const mobileTechLabels = [
+  'React Native',
+  'Expo',
+  'APIs',
+  'Firebase',
+] as const
 
 export const toolboxItems = [
   'React',
@@ -146,23 +222,6 @@ export const toolboxItems = [
   'AWS',
   'Git',
 ] as const
-
-export const mobileTechLabels = [
-  'React Native',
-  'Expo',
-  'APIs',
-  'Firebase',
-] as const
-
-export const systemNodes = [
-  { id: 'user', label: 'USER' },
-  { id: 'frontend', label: 'FRONTEND' },
-  { id: 'api', label: 'API' },
-  { id: 'server', label: 'SERVER' },
-  { id: 'database', label: 'DATABASE' },
-] as const
-
-export const storyProjects = projects
 
 export function getChapterAtProgress(progress: number): StoryChapter {
   const clamped = Math.min(1, Math.max(0, progress))

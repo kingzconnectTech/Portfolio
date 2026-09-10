@@ -371,7 +371,7 @@ export function MobilePhone({ progress }: Props) {
               </div>
             ))}
             <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-              {mobileTechLabels.map((label) => (
+              {mobileTechLabels.map((label: string) => (
                 <span
                   key={label}
                   style={{
@@ -599,7 +599,7 @@ export function ToolboxTable({ progress }: Props) {
       <mesh position={[0, 0.76, 0]} material={walnut}>
         <boxGeometry args={[2.8, 0.02, 1.1]} />
       </mesh>
-      {toolboxItems.map((item, i) => {
+      {toolboxItems.map((item: string, i: number) => {
         const local = smoothstep(i * 0.05, i * 0.05 + 0.2, t) * appear
         if (local < 0.02) return null
         const col = i % 4

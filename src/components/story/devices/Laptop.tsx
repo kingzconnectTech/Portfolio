@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { useStoryMaterials, storyColors } from '../materials'
+import { storyColors } from '../materials'
+import { normalizeGltfScene } from '../normalizeGltf'
 
 type LaptopProps = {
   openAmount?: number
@@ -13,7 +14,7 @@ type LaptopProps = {
   scale?: number
 }
 
-/** Realistic laptop using actual 3D model */
+/** Realistic laptop — GLB normalized to ~0.36m width */
 export function RealisticLaptop({
   openAmount = 1,
   screenBright = 0.4,
@@ -21,27 +22,39 @@ export function RealisticLaptop({
   codeStage = 0,
   scale = 1,
 }: LaptopProps) {
-  const lid = useRef<THREE.Group>(null)
-  const mats = useStoryMaterials()
-  const screenMat = useRef(mats.screenBright.clone())
+  const group = useRef<THREE.Group>(null)
   const [model, setModel] = useState<THREE.Group | null>(null)
 
   useEffect(() => {
     const loader = new GLTFLoader()
-    loader.load('/models/laptop.glb', (gltf) => {
-      const clonedScene = gltf.scene.clone()
-      setModel(clonedScene)
-    }, undefined, (error) => {
-      console.error('Error loading laptop model:', error)
-    })
+    loader.load(
+      '/models/laptop.glb',
+      (gltf) => {
+        setModel(
+          normalizeGltfScene(gltf.scene, {
+            targetSize: 0.36,
+            ground: true,
+            centerXZ: true,
+          }),
+        )
+      },
+      undefined,
+      (error) => console.error('Error loading laptop model:', error),
+    )
   }, [])
 
   useFrame(() => {
-    if (lid.current) {
-      // Animate lid open/close based on progress
-      lid.current.rotation.x = THREE.MathUtils.lerp(-Math.PI / 2, -0.15, openAmount)
-    }
-    screenMat.current.emissiveIntensity = 0.35 + screenBright * 1.2
+    // Soft emissive pulse on any emissive materials if present
+    if (!group.current) return
+    group.current.traverse((obj) => {
+      if (obj instanceof THREE.Mesh && obj.material && 'emissiveIntensity' in obj.material) {
+        const m = obj.material as THREE.MeshStandardMaterial
+        if (m.emissive && m.emissive.getHex() !== 0) {
+          m.emissiveIntensity = 0.35 + screenBright * 0.9
+        }
+      }
+    })
+    void openAmount
   })
 
   const codeLines =
@@ -52,25 +65,23 @@ export function RealisticLaptop({
         : ['// React · Node · API · DB', 'app.use("/api", router)', 'await db.query(sql)', 'res.json(payload)']
 
   if (!model) {
-    // Fallback to loading state
     return (
       <mesh scale={scale}>
-        <boxGeometry args={[0.5, 0.3, 0.4]} />
+        <boxGeometry args={[0.35, 0.02, 0.24]} />
         <meshStandardMaterial color="#333" />
       </mesh>
     )
   }
 
   return (
-    <group scale={scale}>
-      <primitive object={model} ref={lid} />
-
+    <group ref={group} scale={scale}>
+      <primitive object={model} />
       {showUI && openAmount > 0.25 && (
         <Html
           transform
-          position={[0, 0.15, 0]}
-          distanceFactor={1.05}
-          style={{ width: 300, height: 176, pointerEvents: 'none', opacity: Math.min(1, openAmount) }}
+          position={[0, 0.16, 0.02]}
+          distanceFactor={0.85}
+          style={{ width: 280, height: 165, pointerEvents: 'none', opacity: Math.min(1, openAmount) }}
         >
           <LaptopIDE codeLines={codeLines} codeStage={codeStage} />
         </Html>
@@ -86,65 +97,46 @@ function LaptopIDE({ codeLines, codeStage }: { codeLines: string[]; codeStage: n
         width: '100%',
         height: '100%',
         background: '#0d1117',
-        borderRadius: 4,
+        borderRadius: 3,
         overflow: 'hidden',
         fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-        fontSize: 8,
+        fontSize: 8.5,
         color: '#c9d1d9',
         display: 'grid',
-        gridTemplateColumns: '68px 1fr 92px',
+        gridTemplateColumns: '72px 1fr 88px',
         boxSizing: 'border-box',
       }}
     >
-      <div style={{ background: '#010409', padding: 5, borderRight: '1px solid #21262d' }}>
-        <div style={{ color: '#8b949e', marginBottom: 5, fontSize: 6.5, letterSpacing: '0.05em' }}>EXPLORER</div>
-        {['src', '  components', '  App.tsx', '  api.ts', '  hooks', 'public', 'package.json'].map((f) => (
-          <div key={f} style={{ color: f.includes('.') ? '#79c0ff' : '#8b949e', marginBottom: 1.5, fontSize: 7 }}>
+      <div style={{ background: '#010409', padding: 6, borderRight: '1px solid #21262d' }}>
+        <div style={{ color: '#8b949e', marginBottom: 6, fontSize: 7 }}>EXPLORER</div>
+        {['src', '  App.tsx', '  api.ts', 'public', 'package.json'].map((f) => (
+          <div key={f} style={{ color: f.includes('.') ? '#79c0ff' : '#8b949e', marginBottom: 2 }}>
             {f}
           </div>
         ))}
       </div>
-      <div style={{ padding: 6 }}>
-        <div style={{ color: '#8b949e', marginBottom: 4, fontSize: 6.5, letterSpacing: '0.05em' }}>App.tsx — editor</div>
-        <div style={{ marginBottom: 3, color: '#ff7b72', fontSize: 7 }}>{'import React from "react"'}</div>
+      <div style={{ padding: 8 }}>
+        <div style={{ color: '#8b949e', marginBottom: 6, fontSize: 7 }}>App.tsx — editor</div>
         {codeLines.map((l) => (
-          <div key={l} style={{ marginBottom: 1.5, color: l.includes('import') || l.includes('<') ? '#ff7b72' : l.includes('const') || l.includes('await') ? '#79c0ff' : '#c9d1d9', fontSize: 7 }}>
+          <div key={l} style={{ marginBottom: 2, color: l.includes('import') || l.includes('<') ? '#ff7b72' : '#c9d1d9' }}>
             {l}
           </div>
         ))}
-        <div style={{ marginTop: 8, color: '#3fb950', fontSize: 6.5 }}>
-          {codeStage < 0.4 ? '$ npm run dev — ready on :5173' : codeStage < 0.75 ? '$ npm run build — optimized' : '$ npm start — production'}
-        </div>
+        <div style={{ marginTop: 10, color: '#3fb950', fontSize: 7 }}>$ npm run dev — ready on :5173</div>
       </div>
-      <div style={{ background: '#161b22', padding: 5, borderLeft: '1px solid #21262d' }}>
-        <div style={{ color: '#8b949e', marginBottom: 5, fontSize: 6.5, letterSpacing: '0.05em' }}>PREVIEW</div>
+      <div style={{ background: '#161b22', padding: 6, borderLeft: '1px solid #21262d' }}>
+        <div style={{ color: '#8b949e', marginBottom: 6, fontSize: 7 }}>PREVIEW</div>
         <div
           style={{
             background: '#0d1117',
-            borderRadius: 3,
-            padding: 6,
+            borderRadius: 2,
+            padding: 8,
             color: storyColors.cream,
-            fontSize: 8,
-            minHeight: 65,
-            border: '1px solid #21262d',
+            fontSize: 9,
+            minHeight: 70,
           }}
         >
-          {codeStage < 0.4 ? (
-            <div>
-              <div style={{ fontSize: 10, marginBottom: 2 }}>Hello World</div>
-              <div style={{ fontSize: 6, opacity: 0.5 }}>v1.0.0</div>
-            </div>
-          ) : codeStage < 0.75 ? (
-            <div>
-              <div style={{ fontSize: 10, marginBottom: 2 }}>React App</div>
-              <div style={{ fontSize: 6, opacity: 0.5 }}>v2.4.1</div>
-            </div>
-          ) : (
-            <div>
-              <div style={{ fontSize: 10, marginBottom: 2 }}>API · Live</div>
-              <div style={{ fontSize: 6, opacity: 0.5, color: '#3fb950' }}>● Connected</div>
-            </div>
-          )}
+          {codeStage < 0.4 ? 'Hello World' : codeStage < 0.75 ? 'React App' : 'API · Live'}
         </div>
       </div>
     </div>

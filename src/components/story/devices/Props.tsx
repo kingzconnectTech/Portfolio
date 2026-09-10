@@ -3,6 +3,7 @@ import { Html, RoundedBox } from '@react-three/drei'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { useStoryMaterials, storyColors } from '../materials'
+import { normalizeGltfScene } from '../normalizeGltf'
 
 export function WalnutDesk({
   width = 2.4,
@@ -14,76 +15,47 @@ export function WalnutDesk({
   height?: number
 }) {
   const mats = useStoryMaterials()
-  const [model, setModel] = useState<THREE.Group | null>(null)
-
-  useEffect(() => {
-    const loader = new GLTFLoader()
-    loader.load(
-      '/models/desk.glb',
-      (gltf) => {
-        const clonedScene = gltf.scene.clone()
-        clonedScene.traverse((obj) => {
-          if (obj instanceof THREE.Mesh) {
-            obj.castShadow = true
-            obj.receiveShadow = true
-          }
-        })
-        setModel(clonedScene)
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading desk model:', error)
-      },
-    )
-  }, [])
-
-  void width
-  void depth
-  void height
-
-  if (!model) {
-    const topT = 0.055
-    return (
-      <group>
-        <RoundedBox
-          args={[width, topT, depth]}
-          radius={0.018}
-          smoothness={5}
-          position={[0, height, 0]}
-          castShadow
-          receiveShadow
-          material={mats.walnut}
-        />
-        <mesh position={[0, height - topT / 2 - 0.012, 0]} material={mats.walnutDark} receiveShadow>
-          <boxGeometry args={[width * 0.97, 0.022, depth * 0.97]} />
-        </mesh>
-        <mesh position={[0, height - topT - 0.008, 0]} material={mats.walnutDark}>
-          <boxGeometry args={[width * 0.94, 0.012, depth * 0.94]} />
-        </mesh>
-        {[
-          [-width / 2 + 0.1, height / 2, -depth / 2 + 0.1],
-          [width / 2 - 0.1, height / 2, -depth / 2 + 0.1],
-          [-width / 2 + 0.1, height / 2, depth / 2 - 0.1],
-          [width / 2 - 0.1, height / 2, depth / 2 - 0.1],
-        ].map((p, i) => (
-          <group key={i} position={p as [number, number, number]}>
-            <RoundedBox
-              args={[0.08, height - topT, 0.08]}
-              radius={0.01}
-              smoothness={3}
-              castShadow
-              material={mats.walnutDark}
-            />
-            <mesh position={[0, 0, 0.04]} material={mats.walnut}>
-              <boxGeometry args={[0.06, height - topT - 0.02, 0.02]} />
-            </mesh>
-          </group>
-        ))}
-      </group>
-    )
-  }
-
-  return <primitive object={model} />
+  // Desk GLB is ~2600 units with non-furniture proportions — keep procedural
+  // desk so meter-scale camera framing stays consistent with other props.
+  const topT = 0.055
+  return (
+    <group>
+      <RoundedBox
+        args={[width, topT, depth]}
+        radius={0.018}
+        smoothness={5}
+        position={[0, height, 0]}
+        castShadow
+        receiveShadow
+        material={mats.walnut}
+      />
+      <mesh position={[0, height - topT / 2 - 0.012, 0]} material={mats.walnutDark} receiveShadow>
+        <boxGeometry args={[width * 0.97, 0.022, depth * 0.97]} />
+      </mesh>
+      <mesh position={[0, height - topT - 0.008, 0]} material={mats.walnutDark}>
+        <boxGeometry args={[width * 0.94, 0.012, depth * 0.94]} />
+      </mesh>
+      {[
+        [-width / 2 + 0.1, height / 2, -depth / 2 + 0.1],
+        [width / 2 - 0.1, height / 2, -depth / 2 + 0.1],
+        [-width / 2 + 0.1, height / 2, depth / 2 - 0.1],
+        [width / 2 - 0.1, height / 2, depth / 2 - 0.1],
+      ].map((p, i) => (
+        <group key={i} position={p as [number, number, number]}>
+          <RoundedBox
+            args={[0.08, height - topT, 0.08]}
+            radius={0.01}
+            smoothness={3}
+            castShadow
+            material={mats.walnutDark}
+          />
+          <mesh position={[0, 0, 0.04]} material={mats.walnut}>
+            <boxGeometry args={[0.06, height - topT - 0.02, 0.02]} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  )
 }
 
 export function CoffeeMug({ scale = 1 }: { scale?: number }) {
@@ -95,14 +67,13 @@ export function CoffeeMug({ scale = 1 }: { scale?: number }) {
     loader.load(
       '/models/mug.glb',
       (gltf) => {
-        const clonedScene = gltf.scene.clone()
-        clonedScene.traverse((obj) => {
-          if (obj instanceof THREE.Mesh) {
-            obj.castShadow = true
-            obj.receiveShadow = true
-          }
-        })
-        setModel(clonedScene)
+        setModel(
+          normalizeGltfScene(gltf.scene, {
+            targetSize: 0.1,
+            ground: true,
+            centerXZ: true,
+          }),
+        )
       },
       undefined,
       (error) => {

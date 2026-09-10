@@ -1,8 +1,11 @@
 import type { Project } from '../../data/projects'
 import {
   getChapterAtProgress,
-  storyMeta,
   storyNavChapters,
+  storyPrinciples,
+  storyCapabilities,
+  storyTechnologies,
+  storyFinal,
   storyProjects,
 } from '../../data/story'
 import { useStoryProgress } from './StoryContext'
@@ -15,11 +18,11 @@ type Props = {
 }
 
 export function StoryUI({ entered, selectedProject, onCloseProject }: Props) {
-  const { progress, onExit, onGoProjects, scrollToChapter, onSelectProject } = useStoryProgress()
+  const { progress, onExit, scrollToChapter, onSelectProject, onGoProjects } = useStoryProgress()
   const chapter = getChapterAtProgress(progress)
-  const showIntro = progress < 0.055
-  const showChapterCopy = progress >= 0.055 && progress < 0.9
-  const showFinale = progress >= 0.9
+  const showIntro = progress < 0.06
+  const showChapterCopy = progress >= 0.06 && progress < 0.88
+  const showFinale = progress >= 0.88
   const introOpacity = 1 - smoothstep(0.02, 0.07, progress)
   const chapterOpacity =
     chapter.id === 'intro' ? 0 : smoothstep(chapter.range[0], chapter.range[0] + 0.02, progress) *
@@ -79,12 +82,18 @@ export function StoryUI({ entered, selectedProject, onCloseProject }: Props) {
         style={{ opacity: showIntro ? introOpacity : 0, transition: 'opacity 0.4s ease' }}
       >
         <h1 className="font-hn text-[11vw] leading-[0.92] tracking-[-0.03em] sm:text-[5.5vw] whitespace-pre-line">
-          {storyMeta.title}
+          THIS ISN'T
+          JUST A PORTFOLIO.
         </h1>
-        <p className="mt-6 max-w-md font-hn text-sm text-cream/55 sm:text-base">{storyMeta.subtitle}</p>
+        <p className="mt-6 max-w-md font-hn text-sm text-cream/55 sm:text-base">
+          IT'S THE STORY BEHIND THE WORK.
+        </p>
+        <div className="mt-8 font-hn text-lg tracking-[0.15em] sm:text-xl" style={{ color: '#c4a574' }}>
+          KINGZCONNECT
+        </div>
         <div className="absolute bottom-10 left-0 right-0 flex flex-col items-center gap-2">
           <span className="font-hn text-[10px] tracking-[0.28em] text-cream/45 sm:text-[11px]">
-            {storyMeta.scrollHint}
+            SCROLL TO EXPLORE
           </span>
           <span className="story-scroll-hint text-cream/40">↓</span>
         </div>
@@ -100,13 +109,16 @@ export function StoryUI({ entered, selectedProject, onCloseProject }: Props) {
             {chapter.number}
           </div>
           <h2 className="mt-2 font-hn text-2xl tracking-[-0.02em] sm:text-3xl">{chapter.title}</h2>
+          {chapter.subtitle && (
+            <p className="mt-1 font-hn text-xs tracking-[0.18em] text-cream/50 sm:text-sm">
+              {chapter.subtitle}
+            </p>
+          )}
           <div className="mt-5 space-y-2">
-            {chapter.lines.map((line) => (
+            {chapter.content.map((line) => (
               <p
                 key={line}
-                className={`font-hn text-sm leading-relaxed sm:text-[15px] ${
-                  line === 'solve it.' ? 'text-cream mt-3 tracking-[0.04em]' : 'text-cream/60'
-                }`}
+                className="font-hn text-sm leading-relaxed sm:text-[15px] text-cream/60"
               >
                 {line}
               </p>
@@ -115,8 +127,8 @@ export function StoryUI({ entered, selectedProject, onCloseProject }: Props) {
         </div>
       )}
 
-      {/* Chapter 08 — HTML project hits for reliable selection */}
-      {chapter.id === 'building' && (
+      {/* Chapter 04 — Projects showcase */}
+      {chapter.id === 'projects' && (
         <div
           className="pointer-events-auto absolute bottom-24 left-5 right-5 flex gap-2 overflow-x-auto pb-1 sm:bottom-28 sm:left-10 sm:right-auto sm:max-w-xl"
           style={{ opacity: chapterOpacity }}
@@ -137,36 +149,120 @@ export function StoryUI({ entered, selectedProject, onCloseProject }: Props) {
         </div>
       )}
 
+      {/* Chapter 06 — Principles */}
+      {chapter.id === 'thinking' && (
+        <div
+          className="absolute right-5 top-[30%] max-w-[14rem] sm:right-10 sm:max-w-xs lg:right-14"
+          style={{ opacity: chapterOpacity }}
+        >
+          {storyPrinciples.map((principle, index) => {
+            const principleProgress = (progress - chapter.range[0]) / (chapter.range[1] - chapter.range[0])
+            const principleOpacity = smoothstep(index * 0.25, index * 0.25 + 0.08, principleProgress) *
+              (1 - smoothstep((index + 1) * 0.25 - 0.05, (index + 1) * 0.25, principleProgress))
+            return (
+              <div
+                key={principle.number}
+                className="mb-6 last:mb-0"
+                style={{ opacity: principleOpacity }}
+              >
+                <div className="font-hn text-[10px] tracking-[0.22em]" style={{ color: '#c4a574' }}>
+                  {principle.number}
+                </div>
+                <h3 className="mt-1 font-hn text-lg tracking-[-0.02em] sm:text-xl">{principle.title}</h3>
+                <p className="mt-2 font-hn text-xs leading-relaxed text-cream/60 sm:text-sm">
+                  {principle.description}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Chapter 07 — Capabilities */}
+      {chapter.id === 'capabilities' && (
+        <div
+          className="absolute right-5 top-[30%] max-w-[14rem] sm:right-10 sm:max-w-xs lg:right-14"
+          style={{ opacity: chapterOpacity }}
+        >
+          {storyCapabilities.map((capability, index) => {
+            const capabilityProgress = (progress - chapter.range[0]) / (chapter.range[1] - chapter.range[0])
+            const capabilityOpacity = smoothstep(index * 0.25, index * 0.25 + 0.08, capabilityProgress) *
+              (1 - smoothstep((index + 1) * 0.25 - 0.05, (index + 1) * 0.25, capabilityProgress))
+            return (
+              <div
+                key={capability.category}
+                className="mb-6 last:mb-0"
+                style={{ opacity: capabilityOpacity }}
+              >
+                <h3 className="font-hn text-lg tracking-[-0.02em] sm:text-xl">{capability.category}</h3>
+                <p className="mt-2 font-hn text-xs leading-relaxed text-cream/60 sm:text-sm">
+                  {capability.description}
+                </p>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      {/* Chapter 07 — Technologies */}
+      {chapter.id === 'capabilities' && (
+        <div
+          className="absolute bottom-24 left-5 right-5 sm:bottom-28 sm:left-10 sm:right-auto sm:max-w-xl"
+          style={{ opacity: chapterOpacity }}
+        >
+          <div className="mb-3 font-hn text-[10px] tracking-[0.18em] text-cream/40">
+            TECHNOLOGY
+          </div>
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+            {storyTechnologies.map((tech) => (
+              <button
+                key={tech.name}
+                type="button"
+                className="border border-cream/12 bg-black/30 px-3 py-2 text-center transition-colors hover:border-cream/30 hover:bg-black/50"
+              >
+                <div className="font-hn text-xs text-cream">{tech.name}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Enhanced Finale */}
       <div
         className="absolute inset-x-0 bottom-[18%] flex flex-col items-center px-6 text-center"
         style={{
-          opacity: showFinale ? smoothstep(0.9, 0.96, progress) : 0,
+          opacity: showFinale ? smoothstep(0.88, 0.94, progress) : 0,
           pointerEvents: showFinale ? 'auto' : 'none',
         }}
       >
         <div className="font-hn text-[11px] tracking-[0.28em]" style={{ color: '#c4a574' }}>
-          10
+          08
         </div>
-        <h2 className="mt-2 font-hn text-3xl tracking-[-0.02em] sm:text-4xl">TODAY</h2>
+        <h2 className="mt-2 font-hn text-3xl tracking-[-0.02em] sm:text-4xl">{storyFinal.headline}</h2>
         <div className="mt-5 space-y-1 font-hn text-sm text-cream/65 sm:text-base">
-          {storyMeta.final.lines.map((l) => (
+          {storyFinal.lines.map((l) => (
             <p key={l}>{l}</p>
           ))}
         </div>
-        <p className="mt-8 font-hn text-sm tracking-[0.22em] sm:text-base">{storyMeta.final.brand}</p>
-        <div className="mt-6 space-y-1 font-hn text-xs text-cream/50 sm:text-sm">
-          {storyMeta.final.statement.map((l) => (
-            <p key={l}>{l}</p>
-          ))}
+        <p className="mt-8 font-hn text-sm tracking-[0.22em] sm:text-base">{storyFinal.brand}</p>
+        <p className="mt-3 font-hn text-xs text-cream/50 sm:text-sm">{storyFinal.role}</p>
+        <p className="mt-6 font-hn text-xs text-cream/40 sm:text-sm">{storyFinal.closing}</p>
+        <div className="mt-8 flex gap-4">
+          <button
+            type="button"
+            onClick={onGoProjects}
+            className="pointer-events-auto border border-cream/30 px-6 py-3 font-hn text-[11px] tracking-[0.22em] text-cream transition-colors hover:border-cream hover:bg-cream/5"
+          >
+            {storyFinal.cta1} →
+          </button>
+          <button
+            type="button"
+            onClick={onExit}
+            className="pointer-events-auto border border-cream/30 px-6 py-3 font-hn text-[11px] tracking-[0.22em] text-cream transition-colors hover:border-cream hover:bg-cream/5"
+          >
+            {storyFinal.cta2}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={onExit}
-          className="pointer-events-auto mt-8 border border-cream/30 px-6 py-3 font-hn text-[11px] tracking-[0.22em] text-cream transition-colors hover:border-cream hover:bg-cream/5"
-        >
-          BACK TO HOME
-        </button>
       </div>
 
       {/* Bottom progress */}

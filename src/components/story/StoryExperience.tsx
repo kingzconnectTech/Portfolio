@@ -209,18 +209,6 @@ export function StoryExperience({ open, onClose, onGoProjects }: StoryExperience
           onCloseProject={() => setSelectedProject(null)}
         />
 
-        <div
-          className="pointer-events-none absolute left-1/2 top-[12%] z-[12] hidden -translate-x-1/2 text-center sm:block"
-          style={{
-            opacity: progress > 0.01 && progress < 0.05 ? 0.55 : 0,
-            transition: 'opacity 0.4s ease',
-          }}
-        >
-          <p className="font-hn text-[11px] tracking-[0.12em] text-cream/70">
-            Ideas became experiments. Experiments became products. Products became a craft.
-          </p>
-        </div>
-
         <div className="sr-only">
           {storyNavChapters.map((c) => (
             <div key={c.id}>

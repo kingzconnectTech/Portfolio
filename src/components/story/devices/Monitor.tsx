@@ -4,6 +4,7 @@ import { RoundedBox, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { useStoryMaterials, storyColors } from '../materials'
+import { normalizeGltfScene } from '../normalizeGltf'
 
 type MonitorProps = {
   width?: number
@@ -29,14 +30,13 @@ export function RealisticMonitor({
     loader.load(
       '/models/monitor.glb',
       (gltf) => {
-        const clonedScene = gltf.scene.clone()
-        clonedScene.traverse((obj) => {
-          if (obj instanceof THREE.Mesh) {
-            obj.castShadow = true
-            obj.receiveShadow = true
-          }
-        })
-        setModel(clonedScene)
+        setModel(
+          normalizeGltfScene(gltf.scene, {
+            targetSize: 0.55,
+            ground: true,
+            centerXZ: true,
+          }),
+        )
       },
       undefined,
       (error) => {
@@ -71,8 +71,8 @@ export function RealisticMonitor({
         {showUI && (
           <Html
             transform
-            position={[0, 0.02, 0.07]}
-            distanceFactor={1.35}
+            position={[0, 0.22, 0.04]}
+            distanceFactor={0.9}
             style={{ width: 260, pointerEvents: 'none' }}
           >
             <MonitorUI variant={uiVariant} label={label} />

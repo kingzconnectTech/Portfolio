@@ -1,18 +1,16 @@
-import { StoryChain, StoryCamera, StoryLighting } from './StoryChain'
 import { useStoryProgress } from './StoryContext'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'
 import { storyColors } from './materials'
-import { smoothstep } from './math'
+import { WorkspaceComposition } from './WorkspaceComposition'
 
 export function StoryWorld() {
-  const { progress, isMobile } = useStoryProgress()
+  const { isMobile } = useStoryProgress()
   const bg = useRef(new THREE.Color(storyColors.charcoalDeep))
 
   useFrame(({ scene }) => {
-    const voiding = smoothstep(0.88, 0.97, progress)
-    bg.current.set(storyColors.charcoalDeep).lerp(new THREE.Color('#080808'), voiding)
+    bg.current.set(storyColors.charcoalDeep)
     scene.background = bg.current
     const fog = scene.fog as THREE.Fog | null
     if (fog) {
@@ -24,9 +22,9 @@ export function StoryWorld() {
 
   return (
     <>
-      <StoryCamera />
-      <StoryLighting />
-      <StoryChain />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[5, 8, 5]} intensity={0.8} castShadow />
+      <WorkspaceComposition />
     </>
   )
 }

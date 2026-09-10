@@ -40,6 +40,11 @@ html, body, #root {
   }
 }
 
+/* Ensure GSAP animations work properly by not interfering with inline styles */
+.will-change-transform {
+  will-change: transform, opacity;
+}
+
 @keyframes story-hint-bob {
   0%,
   100% {
