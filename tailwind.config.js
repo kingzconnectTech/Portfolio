@@ -11,8 +11,10 @@ export default {
       },
       fontFamily: {
         hn: ['"Helvetica Neue ME"', 'Helvetica', 'Arial', 'sans-serif'],
+        weghorst: ['"Weghorst Italic"', '"Helvetica Neue ME"', 'Helvetica', 'Arial', 'sans-serif'],
         sans: ['"Helvetica Neue ME"', 'Helvetica', 'Arial', 'sans-serif'],
         serif: ['Georgia', 'serif'],
+        poppins: ['Poppins', 'sans-serif'],
       },
       keyframes: {
         'fade-in': {

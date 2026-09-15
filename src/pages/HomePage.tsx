@@ -28,8 +28,8 @@ export function HomePage() {
 
   const handleNav = useCallback(
     (link: (typeof navLinks)[number]) => {
-      if (link === 'Story') {
-        // Story is now a separate route, handled by Link
+      if (link === 'Story' || link === 'Message' || link === 'Jobs' || link === 'Skills') {
+        // Story, Message, Jobs, and Skills are now separate routes, handled by Link
         return
       }
       setDrawerOpen(false)
@@ -101,11 +101,18 @@ export function HomePage() {
               {currentYear}
             </div>
             <nav className="flex flex-col gap-0.5 text-sm">
-              {navLinks.map((link, i) => (
-                link === 'Story' ? (
+              {navLinks.map((link, i) => {
+                const routeMap: Record<string, string> = {
+                  'Story': '/story',
+                  'Message': '/message',
+                  'Jobs': '/jobs',
+                  'Skills': '/skills'
+                }
+                
+                return routeMap[link] ? (
                   <Link
                     key={link}
-                    to="/story"
+                    to={routeMap[link]}
                     className="text-left text-cream opacity-100 hover:opacity-60 duration-300 anim-fade-up"
                     style={{ animationDelay: `${1000 + i * 80}ms` }}
                   >
@@ -122,7 +129,7 @@ export function HomePage() {
                     {link}
                   </button>
                 )
-              ))}
+              })}
             </nav>
             <nav className="flex flex-col gap-0.5 text-sm">
               {socialLinks.map((link, i) => (
@@ -205,11 +212,18 @@ export function HomePage() {
               Site Index
             </div>
             <nav className="flex flex-col gap-2">
-              {navLinks.map((link, i) => (
-                link === 'Story' ? (
+              {navLinks.map((link, i) => {
+                const routeMap: Record<string, string> = {
+                  'Story': '/story',
+                  'Message': '/message',
+                  'Jobs': '/jobs',
+                  'Skills': '/skills'
+                }
+                
+                return routeMap[link] ? (
                   <Link
                     key={link}
-                    to="/story"
+                    to={routeMap[link]}
                     onClick={() => setDrawerOpen(false)}
                     className="text-left font-hn text-4xl text-cream transition-all duration-500"
                     style={{
@@ -235,7 +249,7 @@ export function HomePage() {
                     {link}
                   </button>
                 )
-              ))}
+              })}
             </nav>
           </div>
 

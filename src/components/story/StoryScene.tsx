@@ -145,7 +145,7 @@ export const StoryScene = forwardRef<HTMLDivElement, StorySceneProps>(function S
 
       {/* ── Direct Text Overlay (NO cards/boxes) ── */}
       <div className={`absolute inset-0 z-20 flex flex-col ${flexClasses}`}>
-        <div className={`scene-text-container ${paddingClasses} will-change-transform`}>
+        <div className={`scene-text-container ${paddingClasses} will-change-transform p-6 sm:p-8 rounded-2xl backdrop-blur-md bg-white/5 shadow-xl`}>
           {/* Scene Number */}
           <div
             className="scene-number font-hn text-[10px] tracking-[0.34em] mb-4 sm:mb-5 sm:text-[11px] select-none will-change-transform"

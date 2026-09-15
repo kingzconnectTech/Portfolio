@@ -64,8 +64,6 @@ function getTextPaddingClasses(pos: CinematicSceneType['textPosition']): string 
 
 export type CinematicSceneProps = {
   scene: CinematicSceneType
-  /** Whether this is the currently snapped-to scene */
-  isActive: boolean
   reducedMotion: boolean
   /** The scroller element — needed for GSAP ScrollTrigger in snap containers */
   scrollerEl: HTMLElement | null
@@ -73,7 +71,6 @@ export type CinematicSceneProps = {
 
 export function CinematicSceneComponent({
   scene,
-  isActive,
   reducedMotion,
   scrollerEl,
 }: CinematicSceneProps) {

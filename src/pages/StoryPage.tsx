@@ -77,7 +77,6 @@ export function StoryPage() {
         return
       }
 
-      const direction = targetIndex > currentSceneIndex ? 1 : -1
       const fromIndex = currentSceneIndex
 
       // Lock input immediately to prevent gesture spamming
@@ -99,7 +98,6 @@ export function StoryPage() {
         }
 
         const outgoingMedia = outgoingEl?.querySelector<HTMLElement>('.scene-media-layer')
-        const outgoingText = outgoingEl?.querySelector<HTMLElement>('.scene-text-container')
 
         const incomingMedia = incomingEl.querySelector<HTMLElement>('.scene-media-layer')
         const incomingOverlay = incomingEl.querySelector<HTMLElement>('.scene-overlay-layer')
@@ -347,7 +345,6 @@ export function StoryPage() {
       outgoingScene={outgoingSceneData}
       totalScenes={TOTAL_SCENES}
       activeSceneIndex={currentSceneIndex}
-      goToScene={goToScene}
       currentSceneRef={currentSceneRef}
       outgoingSceneRef={outgoingSceneRef}
     />
