@@ -2,20 +2,29 @@ import { useEffect, useRef, useState, useCallback } from 'react'
 import { gsap } from 'gsap'
 import { cinematicScenes, TOTAL_SCENES } from '../data/story-cinematic'
 import { StoryViewport } from '../components/story/StoryViewport'
+import { BREAKPOINTS, useMediaQuery } from '../hooks/useMediaQuery'
 
 const WHEEL_THRESHOLD = 40
-const SWIPE_THRESHOLD = 40
+/** Deliberate swipe distance (px) before a chapter change. */
+const SWIPE_THRESHOLD = 48
+/** A quick flick needs less distance — but only within SWIPE_FLICK_MS. */
+const SWIPE_FLICK_DISTANCE = 24
+const SWIPE_FLICK_MS = 250
 
 export function StoryPage() {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0)
   const [outgoingSceneIndex, setOutgoingSceneIndex] = useState<number | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
 
+  // Phones get shorter, snappier entrances.
+  const isCompact = !useMediaQuery(BREAKPOINTS.tablet)
+
   const isTransitioning = useRef(false)
   const wheelAccumulator = useRef(0)
   const wheelResetTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const touchStartY = useRef<number | null>(null)
   const touchStartX = useRef<number | null>(null)
+  const touchStartTime = useRef<number | null>(null)
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const currentSceneRef = useRef<HTMLDivElement>(null)
@@ -36,9 +45,13 @@ export function StoryPage() {
     const originalHtmlOverflow = document.documentElement.style.overflow
     const originalBodyOverflow = document.body.style.overflow
     const originalBodyHeight = document.body.style.height
+    const originalHtmlOverscroll = document.documentElement.style.overscrollBehavior
+    const originalBodyOverscroll = document.body.style.overscrollBehavior
 
     document.documentElement.style.overflow = 'hidden'
+    document.documentElement.style.overscrollBehavior = 'none'
     document.body.style.overflow = 'hidden'
+    document.body.style.overscrollBehavior = 'none'
     document.body.style.height = '100dvh'
     window.scrollTo(0, 0)
 
@@ -46,14 +59,17 @@ export function StoryPage() {
 
     return () => {
       document.documentElement.style.overflow = originalHtmlOverflow
+      document.documentElement.style.overscrollBehavior = originalHtmlOverscroll
       document.body.style.overflow = originalBodyOverflow
+      document.body.style.overscrollBehavior = originalBodyOverscroll
       document.body.style.height = originalBodyHeight
     }
   }, [])
 
-  // ── Preload Adjacent Scene Images ─────────────────────────────────────────
+  // ── Preload the first chapter, then the adjacent ones ────────────────────
   useEffect(() => {
-    const indicesToPreload = [currentSceneIndex + 1, currentSceneIndex - 1]
+    // Chapter 00 always: it is the entry point and must not pop in.
+    const indicesToPreload = new Set([0, currentSceneIndex + 1, currentSceneIndex - 1])
     indicesToPreload.forEach((idx) => {
       if (idx >= 0 && idx < TOTAL_SCENES) {
         const scene = cinematicScenes[idx]
@@ -135,16 +151,54 @@ export function StoryPage() {
         }
 
         // ── Simple Smooth Fade Transition ──
-        // Prepare incoming elements
+        // Phones run a lighter version of the same choreography (≈0.5s total);
+        // tablet and desktop keep the original timings.
+        const t = isCompact
+          ? {
+              media: 0.42,
+              overlay: 0.34,
+              number: 0.26,
+              title: 0.3,
+              divider: 0.2,
+              body: 0.3,
+              cta: 0.3,
+              stagger: 0.03,
+              cOverlay: 0.04,
+              cNumber: 0.08,
+              cTitle: 0.1,
+              cDivider: 0.12,
+              cBody: 0.16,
+              cCta: 0.2,
+            }
+          : {
+              media: 0.6,
+              overlay: 0.5,
+              number: 0.4,
+              title: 0.5,
+              divider: 0.3,
+              body: 0.4,
+              cta: 0.4,
+              stagger: 0.05,
+              cOverlay: 0.1,
+              cNumber: 0.2,
+              cTitle: 0.25,
+              cDivider: 0.3,
+              cBody: 0.35,
+              cCta: 0.4,
+            }
+
+        // Prepare incoming elements. The text rises into place; the media and its
+        // overlays only fade, so the photograph never slides.
+        const rise = isCompact ? 18 : 14
         if (incomingMedia) {
           gsap.set(incomingMedia, { opacity: 0 })
         }
         if (incomingOverlay) gsap.set(incomingOverlay, { opacity: 0 })
-        if (incomingNumber) gsap.set(incomingNumber, { opacity: 0 })
-        if (incomingTitle) gsap.set(incomingTitle, { opacity: 0 })
-        if (incomingDivider) gsap.set(incomingDivider, { opacity: 0 })
-        if (incomingBodyLines.length > 0) gsap.set(incomingBodyLines, { opacity: 0 })
-        if (incomingOutroCta) gsap.set(incomingOutroCta, { opacity: 0 })
+        if (incomingNumber) gsap.set(incomingNumber, { opacity: 0, y: rise })
+        if (incomingTitle) gsap.set(incomingTitle, { opacity: 0, y: rise })
+        if (incomingDivider) gsap.set(incomingDivider, { opacity: 0, y: rise })
+        if (incomingBodyLines.length > 0) gsap.set(incomingBodyLines, { opacity: 0, y: rise })
+        if (incomingOutroCta) gsap.set(incomingOutroCta, { opacity: 0, y: rise })
 
         const tl = gsap.timeline({
           defaults: { ease: 'power2.inOut' },
@@ -156,40 +210,67 @@ export function StoryPage() {
 
         // Fade out outgoing scene
         if (outgoingEl) {
-          tl.to(outgoingEl, { opacity: 0, duration: 0.6 }, 0)
+          tl.to(outgoingEl, { opacity: 0, duration: t.media }, 0)
         }
 
         // Fade in incoming scene
         if (incomingEl) {
-          tl.fromTo(incomingEl, { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0)
+          tl.fromTo(incomingEl, { opacity: 0 }, { opacity: 1, duration: t.media }, 0)
         }
 
         // Fade in incoming overlay
         if (incomingOverlay) {
-          tl.to(incomingOverlay, { opacity: 1, duration: 0.5 }, 0.1)
+          tl.to(incomingOverlay, { opacity: 1, duration: t.overlay }, t.cOverlay)
         }
 
-        // Fade in text elements with slight stagger
+        // Fade + rise the text elements, staggered so the block assembles in order
         if (incomingNumber) {
-          tl.to(incomingNumber, { opacity: 1, duration: 0.4 }, 0.2)
+          tl.to(
+            incomingNumber,
+            { opacity: 1, y: 0, duration: t.number, ease: 'power2.out', clearProps: 'transform' },
+            t.cNumber
+          )
         }
         if (incomingTitle) {
-          tl.to(incomingTitle, { opacity: 1, duration: 0.5 }, 0.25)
+          tl.to(
+            incomingTitle,
+            { opacity: 1, y: 0, duration: t.title, ease: 'power2.out', clearProps: 'transform' },
+            t.cTitle
+          )
         }
         if (incomingDivider) {
-          tl.to(incomingDivider, { opacity: 1, duration: 0.3 }, 0.3)
+          tl.to(
+            incomingDivider,
+            { opacity: 1, y: 0, duration: t.divider, ease: 'power2.out', clearProps: 'transform' },
+            t.cDivider
+          )
         }
         if (incomingBodyLines.length > 0) {
-          tl.to(incomingBodyLines, { opacity: 1, duration: 0.4, stagger: 0.05 }, 0.35)
+          tl.to(
+            incomingBodyLines,
+            {
+              opacity: 1,
+              y: 0,
+              duration: t.body,
+              stagger: t.stagger,
+              ease: 'power2.out',
+              clearProps: 'transform',
+            },
+            t.cBody
+          )
         }
         if (incomingOutroCta) {
-          tl.to(incomingOutroCta, { opacity: 1, duration: 0.4 }, 0.4)
+          tl.to(
+            incomingOutroCta,
+            { opacity: 1, y: 0, duration: t.cta, ease: 'power2.out', clearProps: 'transform' },
+            t.cCta
+          )
         }
 
         activeTimeline.current = tl
       })
     },
-    [currentSceneIndex, reducedMotion]
+    [currentSceneIndex, reducedMotion, isCompact]
   )
 
   const nextScene = useCallback(() => {
@@ -254,10 +335,19 @@ export function StoryPage() {
       if (e.touches.length === 1) {
         touchStartY.current = e.touches[0].clientY
         touchStartX.current = e.touches[0].clientX
+        touchStartTime.current = Date.now()
       }
     }
 
     const handleTouchMove = (e: TouchEvent) => {
+      // Short landscape viewports can scroll an overflowing chapter text block;
+      // let that gesture through instead of hijacking it for chapter navigation.
+      const target = e.target as HTMLElement | null
+      const scroller = target?.closest<HTMLElement>('[data-story-scrollable]')
+      if (scroller && scroller.scrollHeight > scroller.clientHeight + 2) {
+        return
+      }
+
       e.preventDefault()
     }
 
@@ -266,6 +356,7 @@ export function StoryPage() {
       if (isTransitioning.current) {
         touchStartY.current = null
         touchStartX.current = null
+        touchStartTime.current = null
         return
       }
 
@@ -273,8 +364,14 @@ export function StoryPage() {
       const touchEndX = e.changedTouches[0].clientX
       const diffY = touchStartY.current - touchEndY
       const diffX = touchStartX.current - touchEndX
+      const duration = Date.now() - (touchStartTime.current ?? Date.now())
 
-      if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) >= SWIPE_THRESHOLD) {
+      // Navigation needs either a deliberate swipe or a fast flick, so an
+      // accidental tap (tiny movement) never changes the chapter.
+      const isFlick = Math.abs(diffY) >= SWIPE_FLICK_DISTANCE && duration <= SWIPE_FLICK_MS
+      const isDeliberateSwipe = Math.abs(diffY) >= SWIPE_THRESHOLD
+
+      if (Math.abs(diffY) > Math.abs(diffX) && (isDeliberateSwipe || isFlick)) {
         if (diffY > 0) {
           nextScene()
         } else {
@@ -284,6 +381,7 @@ export function StoryPage() {
 
       touchStartY.current = null
       touchStartX.current = null
+      touchStartTime.current = null
     }
 
     el.addEventListener('touchstart', handleTouchStart, { passive: true })

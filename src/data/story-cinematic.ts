@@ -9,10 +9,12 @@ export interface CinematicScene {
   /** Narrative body — each string is a paragraph line */
   body: string[]
   image: string
+  /** Optional portrait crop used below 641px via <picture>. Falls back to `image`. */
+  mobileImage?: string
   imageAlt: string
-  /** CSS object-position for desktop */
+  /** CSS object-position for desktop (exposed as --focal-desktop) */
   imagePosition: string
-  /** CSS object-position for mobile viewports */
+  /** CSS object-position for phones (≤640px), exposed as --focal-mobile */
   mobileImagePosition?: string
   /** Which side of the screen text lives on */
   textPosition: 'left' | 'right' | 'bottom-left' | 'bottom-right' | 'center'
@@ -33,7 +35,8 @@ export const cinematicScenes: CinematicScene[] = [
     image: '/images/story/00-intro.png',
     imageAlt: 'KingzConnect — developer portrait',
     imagePosition: 'center right',
-    mobileImagePosition: 'center 30%',
+    // Portrait crop: keeps the subject (right half of the frame) in view.
+    mobileImagePosition: '70% 20%',
     textPosition: 'bottom-left',
     gradient: 'bottom',
     overlayStrength: 0.72,

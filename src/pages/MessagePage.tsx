@@ -70,7 +70,7 @@ export function MessagePage() {
     return (
       <div
         ref={pageRef}
-        className="fixed inset-0 w-screen h-[100dvh] bg-[#0c0c0c] overflow-hidden"
+        className="fixed inset-0 flex h-[100dvh] w-full flex-col overflow-y-auto overscroll-y-contain bg-[#0c0c0c] lg:overflow-hidden"
       >
         {/* Header */}
         <header className="absolute top-0 left-0 right-0 z-50 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8">
@@ -93,7 +93,7 @@ export function MessagePage() {
         </header>
 
         {/* Success Content */}
-        <div className="success-content absolute inset-0 flex items-center justify-center px-6 sm:px-10">
+        <div className="success-content flex flex-1 items-center justify-center px-6 pb-10 pt-24 sm:px-10 lg:absolute lg:inset-0 lg:pb-0 lg:pt-0">
           <div className="max-w-2xl w-full">
             <div className="mb-8">
               <div className="font-hn text-[10px] tracking-[0.34em] mb-6" style={{ color: '#c4a574' }}>
@@ -122,13 +122,13 @@ export function MessagePage() {
         </div>
 
         {/* Bottom Metadata */}
-        <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 sm:px-10 sm:pb-8 flex justify-between items-end text-xs sm:text-sm">
+        <div className="flex flex-col items-start gap-4 px-6 pb-6 text-xs sm:flex-row sm:items-end sm:justify-between sm:gap-6 sm:px-10 sm:pb-8 sm:text-sm lg:absolute lg:inset-x-0 lg:bottom-0">
           <div className="metadata font-hn text-cream/40">
             <div>AVAILABLE FOR</div>
             <div className="mt-1">WEB / MOBILE / ECOMMERCE</div>
             <div>DIGITAL PRODUCTS / CREATIVE TECHNOLOGY</div>
           </div>
-          <div className="metadata font-hn text-cream/40 text-right">
+          <div className="metadata font-hn text-cream/40 sm:text-right">
             <div>ABUJA / NIGERIA</div>
             <div className="mt-1">AVAILABLE WORLDWIDE</div>
           </div>
@@ -140,7 +140,7 @@ export function MessagePage() {
   return (
     <div
       ref={pageRef}
-      className="fixed inset-0 w-screen h-[100dvh] bg-[#0c0c0c] overflow-hidden"
+      className="fixed inset-0 flex h-[100dvh] w-full flex-col overflow-y-auto overscroll-y-contain bg-[#0c0c0c] lg:overflow-hidden"
     >
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-50 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8">
@@ -166,7 +166,7 @@ export function MessagePage() {
       </header>
 
       {/* Main Content */}
-      <div className="absolute inset-0 flex items-center px-6 sm:px-10">
+      <div className="flex flex-1 items-center px-6 pb-10 pt-24 sm:px-10 lg:absolute lg:inset-0 lg:pb-0 lg:pt-0">
         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Left Side - Typography */}
           <div className="lg:col-span-7 flex flex-col justify-center">
@@ -243,7 +243,7 @@ export function MessagePage() {
       </div>
 
       {/* Bottom Metadata */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 sm:px-10 sm:pb-8 flex justify-between items-end text-xs sm:text-sm">
+      <div className="flex items-end justify-between gap-6 px-6 pb-6 text-xs sm:px-10 sm:pb-8 sm:text-sm lg:absolute lg:inset-x-0 lg:bottom-0">
         <div className="metadata font-hn text-cream/40">
           <div>AVAILABLE FOR</div>
           <div className="mt-1">WEB / MOBILE / ECOMMERCE</div>

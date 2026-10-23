@@ -1,7 +1,10 @@
 import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { CinematicScene } from '../../data/story-cinematic'
+import { useIsDesktop, useIsLandscape, useIsTabletUp } from '../../hooks/useMediaQuery'
+import { ChapterProgress } from './ChapterProgress'
 import { StoryScene } from './StoryScene'
+import { SwipeHint, type SwipeHintVariant } from './SwipeHint'
 
 export interface StoryViewportProps {
   currentScene: CinematicScene
@@ -24,11 +27,22 @@ export const StoryViewport = forwardRef<HTMLDivElement, StoryViewportProps>(
     },
     containerRef
   ) {
+    const isDesktop = useIsDesktop()
+    const isTabletUp = useIsTabletUp()
+    const isLandscape = useIsLandscape()
+
+    // Stacked layouts (mobile / tablet portrait) keep the top-right free, so the
+    // hint moves up there — the bottom belongs to the chapter text block.
+    const hintVariant: SwipeHintVariant = isDesktop
+      ? 'bottom-center'
+      : isTabletUp && isLandscape
+        ? 'bottom-right'
+        : 'top-right'
 
     return (
       <div
         ref={containerRef}
-        className="fixed inset-0 w-screen h-[100dvh] bg-[#0c0c0c] overflow-hidden select-none"
+        className="story-viewport fixed inset-0 w-screen bg-[#0c0c0c] overflow-hidden select-none"
         style={{
           touchAction: 'none', // Prevents browser pull-to-refresh & native touch scrolling
           userSelect: 'none',
@@ -61,12 +75,31 @@ export const StoryViewport = forwardRef<HTMLDivElement, StoryViewportProps>(
           isOutgoing={false}
         />
 
+        {/* ── Chapter Progress (reflowed layouts only) ── */}
+        {!isDesktop && <ChapterProgress index={activeSceneIndex} total={totalScenes} />}
+
         {/* ── Fixed Global Minimal Navigation (Stays fixed at all times) ── */}
-        <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-6 sm:px-10 sm:py-8 pointer-events-none">
+        <header
+          className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between pointer-events-none ${
+            isDesktop ? 'px-6 py-6 sm:px-10 sm:py-8' : 'px-5 sm:px-10'
+          }`}
+          style={
+            isDesktop
+              ? undefined
+              : {
+                  paddingTop: 'max(16px, env(safe-area-inset-top))',
+                  paddingBottom: '16px',
+                }
+          }
+        >
           <div className="flex items-center gap-6">
             <Link
               to="/"
-              className="pointer-events-auto font-hn text-xs tracking-[0.26em] text-cream hover:text-white transition-opacity duration-300 hover:opacity-75 sm:text-sm font-semibold flex items-center gap-2"
+              className={`pointer-events-auto font-hn tracking-[0.26em] text-cream font-semibold flex items-center gap-2 transition-opacity duration-300 text-xs sm:text-sm ${
+                isDesktop
+                  ? 'hover:text-white hover:opacity-75'
+                  : '-ml-2.5 min-h-[44px] min-w-[44px] rounded-full bg-black/35 px-2.5 backdrop-blur-[2px] hover:text-white active:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60'
+              }`}
               aria-label="Return to Home"
             >
               ← BACK
@@ -74,22 +107,8 @@ export const StoryViewport = forwardRef<HTMLDivElement, StoryViewportProps>(
           </div>
         </header>
 
-
-
-        {/* ── Fixed Bottom Scroll/Gesture Hint (Scene 00 Only) ── */}
-        <div
-          className="fixed bottom-7 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none transition-opacity duration-500 select-none"
-          style={{
-            opacity: activeSceneIndex === 0 ? 1 : 0,
-            visibility: activeSceneIndex === 0 ? 'visible' : 'hidden',
-          }}
-          aria-hidden={activeSceneIndex !== 0}
-        >
-          <span className="font-hn text-[8px] sm:text-[9px] tracking-[0.34em] text-white/50">
-            SCROLL OR USE ARROWS
-          </span>
-          <div className="w-px h-6 bg-white/30 story-scroll-hint" />
-        </div>
+        {/* ── Gesture Hint (Scene 00 Only) ── */}
+        <SwipeHint variant={hintVariant} visible={activeSceneIndex === 0} />
       </div>
     )
   }

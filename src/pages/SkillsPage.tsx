@@ -639,7 +639,7 @@ export function SkillsPage() {
       </section>
 
       {/* Bottom Metadata */}
-      <div className="fixed bottom-0 left-0 right-0 px-6 pb-5 sm:px-10 sm:pb-8 flex justify-between items-end text-xs sm:text-sm pointer-events-none z-40">
+      <div className="z-40 flex items-end justify-between gap-6 px-6 pb-6 pt-10 text-xs sm:px-10 sm:pb-8 sm:text-sm lg:pointer-events-none lg:fixed lg:inset-x-0 lg:bottom-0 lg:pt-0">
         <div className="font-poppins font-hn text-white/40">
           <div>SKILLS</div>
           <div className="mt-1">FRONTEND</div>

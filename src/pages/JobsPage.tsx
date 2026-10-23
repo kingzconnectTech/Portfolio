@@ -1,16 +1,39 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
-import { experienceCategories } from '../data/experience'
+import type { CategoryId, PortfolioProject } from '../data/portfolio'
+import { projectsByCategory, populatedCategories } from '../data/portfolio'
+import { ProjectCard } from '../components/jobs/ProjectCard'
+import { ProjectModal } from '../components/jobs/ProjectModal'
+
+interface OpenEntry {
+  project: PortfolioProject
+  role: string
+}
 
 export function JobsPage() {
-  const [expandedId, setExpandedId] = useState<number | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
-  
+  const [filter, setFilter] = useState<CategoryId | 'all'>('all')
+  const [openEntry, setOpenEntry] = useState<OpenEntry | null>(null)
+
   const pageRef = useRef<HTMLDivElement>(null)
-  const categoryRefs = useRef<(HTMLDivElement | null)[]>([])
+  const triggerRef = useRef<HTMLElement | null>(null)
 
   const currentYear = new Date().getFullYear()
+
+  // Only categories that actually contain work get a section and a filter button.
+  const filters = useMemo(
+    () => [
+      { id: 'all' as const, label: 'ALL' },
+      ...populatedCategories().map(category => ({ id: category.id, label: category.filterLabel })),
+    ],
+    [],
+  )
+
+  const visibleCategories = useMemo(() => {
+    const available = populatedCategories()
+    return filter === 'all' ? available : available.filter(category => category.id === filter)
+  }, [filter])
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -46,8 +69,8 @@ export function JobsPage() {
       '-=0.5'
     )
     .fromTo('.category-item',
-      { opacity: 0, x: 30 },
-      { opacity: 1, x: 0, duration: 0.5, stagger: 0.12 },
+      { opacity: 0, y: 24 },
+      { opacity: 1, y: 0, duration: 0.5, stagger: 0.12 },
       '-=0.3'
     )
     .fromTo('.metadata',
@@ -56,83 +79,25 @@ export function JobsPage() {
       '-=0.4'
     )
 
-    const cleanup = () => {
+    return () => {
       tl.kill()
     }
-
-    return cleanup
   }, [reducedMotion])
 
-  const handleCategoryHover = (id: number) => {
-    if (reducedMotion) {
-      setExpandedId(id)
-      return
-    }
-
-    setExpandedId(id)
-
-    const categoryElement = categoryRefs.current[id - 1]
-    if (categoryElement) {
-      // Animate category expansion
-      gsap.to(categoryElement, {
-        paddingLeft: '1.5rem',
-        scale: 1.02,
-        duration: 0.4,
-        ease: 'power2.out'
-      })
-
-      // Animate project names to become more prominent
-      const projectElements = categoryElement.querySelectorAll('.project-name')
-      projectElements.forEach((el: Element) => {
-        gsap.to(el, {
-          color: 'rgba(255, 255, 255, 0.9)',
-          opacity: 1,
-          duration: 0.3
-        })
-      })
-    }
+  const openProject = (project: PortfolioProject, role: string, trigger: HTMLElement) => {
+    triggerRef.current = trigger
+    setOpenEntry({ project, role })
   }
 
-  const handleCategoryLeave = () => {
-    if (reducedMotion) {
-      setExpandedId(null)
-      return
-    }
-
-    const prevExpandedId = expandedId
-    setExpandedId(null)
-
-    if (prevExpandedId !== null) {
-      const categoryElement = categoryRefs.current[prevExpandedId - 1]
-      if (categoryElement) {
-        // Animate category contraction
-        gsap.to(categoryElement, {
-          paddingLeft: '0',
-          scale: 1,
-          duration: 0.4,
-          ease: 'power2.out'
-        })
-
-        // Animate project names back to subtle
-        const projectElements = categoryElement.querySelectorAll('.project-name')
-        projectElements.forEach((el: Element) => {
-          gsap.to(el, {
-            color: 'rgba(255, 255, 255, 0.5)',
-            opacity: 0.7,
-            duration: 0.3
-          })
-        })
-      }
-    }
+  const closeProject = () => {
+    setOpenEntry(null)
+    triggerRef.current?.focus()
   }
 
   return (
-    <div
-      ref={pageRef}
-      className="fixed inset-0 w-screen h-[100dvh] bg-[#0c0c0c] overflow-hidden"
-    >
+    <div ref={pageRef} className="relative min-h-screen w-full bg-[#0c0c0c]">
       {/* Header */}
-      <header className="absolute top-0 left-0 right-0 z-50 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8 pointer-events-none">
+      <header className="pointer-events-none fixed inset-x-0 top-0 z-50 flex items-start justify-between bg-gradient-to-b from-[#0c0c0c] via-[#0c0c0c]/85 to-transparent px-6 pb-8 pt-6 sm:px-10 sm:pt-8">
         <div className="flex items-center gap-6 pointer-events-auto">
           <Link
             to="/"
@@ -160,113 +125,112 @@ export function JobsPage() {
       </header>
 
       {/* Main Content */}
-      <div className="absolute inset-0 flex items-center px-6 sm:px-10 z-10">
-        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
-          {/* Left Side - Hero Typography */}
-          <div className="lg:col-span-5 flex flex-col justify-center">
-            <h1 className="hero-headline font-weghorst text-[clamp(2.5rem,6vw,7rem)] leading-[0.85] text-white mb-8">
-              THE WORK<br />BEHIND<br />THE WORK.
-            </h1>
-            <p className="hero-subtitle font-hn text-sm text-white/70 max-w-md leading-relaxed">
-              A record of the products, platforms<br />and digital experiences I've built.
-            </p>
+      <main className="relative z-10 mx-auto w-full max-w-7xl px-6 pb-20 pt-28 sm:px-10 sm:pt-32 lg:pt-36">
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-16">
+          {/* Left Column - Hero Typography (sticky on desktop) */}
+          <div className="lg:col-span-5">
+            <div className="flex flex-col lg:sticky lg:top-32 lg:min-h-[calc(100vh-11rem)]">
+              <div>
+                <h1 className="hero-headline font-weghorst text-[clamp(2.5rem,6vw,7rem)] leading-[0.85] text-white mb-6 sm:mb-8">
+                  THE WORK<br />BEHIND<br />THE WORK.
+                </h1>
+                <p className="hero-subtitle font-hn text-sm text-white/70 max-w-md leading-relaxed">
+                  A record of the products, platforms<br />and digital experiences I've built.
+                </p>
+              </div>
+
+              <div className="mt-10 flex items-end justify-between gap-6 lg:mt-auto">
+                <div className="metadata font-hn text-xs text-cream/40 sm:text-sm">
+                  <div>EXPERIENCE</div>
+                  <div className="mt-1">WEB</div>
+                  <div>PRODUCT</div>
+                  <div>MOBILE</div>
+                  <div>E-COMMERCE</div>
+                  <div>CREATIVE TECHNOLOGY</div>
+                </div>
+                <div className="metadata font-hn text-xs text-cream/40 text-right sm:text-sm">
+                  <div>BASED IN</div>
+                  <div className="mt-1">NIGERIA</div>
+                  <div>WORKING WORLDWIDE</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Right Side - Experience Categories */}
-          <div className="lg:col-span-7 flex flex-col justify-start space-y-8 max-h-[85vh] overflow-y-auto pr-2 scrollbar-hide pt-8">
-            {experienceCategories.map((category, index) => {
-              const isExpanded = expandedId === category.id
-
-              return (
-                <div
-                  key={category.id}
-                  ref={el => categoryRefs.current[index] = el}
-                  className="category-item relative"
-                  onMouseEnter={() => handleCategoryHover(category.id)}
-                  onMouseLeave={handleCategoryLeave}
+          {/* Right Column - Category sections with project cards */}
+          <div className="lg:col-span-7">
+            {/* Filter bar */}
+            <div className="mb-10 flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-white/[0.07] pb-4">
+              {filters.map(item => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setFilter(item.id)}
+                  aria-pressed={filter === item.id}
+                  className={`font-hn text-[10px] uppercase tracking-[0.24em] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white/40 ${
+                    filter === item.id ? 'text-white' : 'text-white/40 hover:text-white/70'
+                  }`}
                 >
-                  {/* Category Title */}
-                  <h3 className="font-hn text-xl sm:text-2xl text-white mb-1">
-                    {category.title}
-                  </h3>
+                  {item.label}
+                </button>
+              ))}
+            </div>
 
-                  {/* Role */}
-                  <div className="font-hn text-xs text-white/60 tracking-[0.15em] mb-3">
-                    {category.role}
-                  </div>
+            <div key={filter} className="animate-fade-in">
+              {visibleCategories.map(category => {
+                const items = projectsByCategory(category.id)
 
-                  {/* Projects */}
-                  <div className="space-y-1 mb-3">
-                    {category.projects.map((project, projectIndex) => (
-                      <div
-                        key={projectIndex}
-                        className="project-name font-hn text-sm text-white/70 opacity-70 transition-all duration-300"
-                      >
-                        {project.name}
-                      </div>
-                    ))}
-                  </div>
+                return (
+                  <section key={category.id} className="category-item mb-16 last:mb-0">
+                    <h2 className="font-hn text-xl text-white sm:text-2xl">
+                      {category.title}
+                    </h2>
+                    <div className="mt-1 mb-6 font-hn text-xs tracking-[0.15em] text-white/60">
+                      {category.role}
+                    </div>
 
-                  {/* Expandable Details */}
-                  <div
-                    className="overflow-hidden transition-all duration-500 ease-out"
-                    style={{
-                      maxHeight: isExpanded ? '300px' : '0px',
-                      opacity: isExpanded ? 1 : 0
-                    }}
-                  >
-                    <p className="font-hn text-xs text-white/60 leading-relaxed mb-3 max-w-lg">
-                      {category.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {category.technologies.map((tech, techIndex) => (
-                        <span
-                          key={techIndex}
-                          className="font-hn text-[10px] text-white/40 tracking-[0.1em]"
-                        >
-                          {tech}
-                        </span>
+                    <div className="grid grid-cols-1 gap-5 md:grid-cols-2 sm:gap-6">
+                      {items.map(project => (
+                        <ProjectCard
+                          key={project.id}
+                          project={project}
+                          role={category.role}
+                          reducedMotion={reducedMotion}
+                          onOpen={(p, trigger) => openProject(p, category.role, trigger)}
+                        />
                       ))}
                     </div>
-                  </div>
-                </div>
-              )
-            })}
+                  </section>
+                )
+              })}
 
-            {/* TODAY Section */}
-            <div className="category-item pt-8 border-t border-white/10 relative z-10">
-              <h3 className="hero-headline font-weghorst text-2xl sm:text-3xl text-white mb-4 leading-tight">
-                STILL BUILDING.<br />
-                STILL LEARNING.<br />
-                STILL MOVING.
-              </h3>
-              <Link
-                to="/message"
-                className="inline-flex items-center gap-2 font-hn text-xs tracking-[0.22em] text-white hover:text-white/80 duration-300 group cursor-pointer"
-              >
-                MESSAGE →
-              </Link>
+              {/* Closing statement */}
+              <div className="category-item border-t border-white/10 pt-10">
+                <h3 className="hero-headline font-weghorst text-2xl leading-tight text-white sm:text-3xl">
+                  STILL BUILDING.<br />
+                  STILL LEARNING.<br />
+                  STILL MOVING.
+                </h3>
+                <Link
+                  to="/message"
+                  className="mt-4 inline-flex items-center gap-2 font-hn text-xs tracking-[0.22em] text-white hover:text-white/80 duration-300 cursor-pointer"
+                >
+                  MESSAGE →
+                </Link>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </main>
 
-      {/* Bottom Metadata */}
-      <div className="absolute bottom-0 left-0 right-0 px-6 pb-5 sm:px-10 sm:pb-8 flex justify-between items-end text-xs sm:text-sm">
-        <div className="metadata font-hn text-cream/40">
-          <div>EXPERIENCE</div>
-          <div className="mt-1">WEB</div>
-          <div>PRODUCT</div>
-          <div>MOBILE</div>
-          <div>E-COMMERCE</div>
-          <div>CREATIVE TECHNOLOGY</div>
-        </div>
-        <div className="metadata font-hn text-cream/40 text-right">
-          <div>BASED IN</div>
-          <div className="mt-1">NIGERIA</div>
-          <div>WORKING WORLDWIDE</div>
-        </div>
-      </div>
+      {openEntry && (
+        <ProjectModal
+          key={`${openEntry.project.id}-${openEntry.role}`}
+          project={openEntry.project}
+          role={openEntry.role}
+          onClose={closeProject}
+        />
+      )}
     </div>
   )
 }

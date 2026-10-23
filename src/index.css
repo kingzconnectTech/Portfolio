@@ -61,6 +61,51 @@ html, body, #root {
   animation: story-hint-bob 2.4s ease-in-out infinite;
 }
 
+/* ── Story viewport height ──
+   svh is the stable baseline (toolbar visible): the composition never jumps or
+   gets clipped as mobile browser chrome shows/hides. dvh/vh are fallbacks for
+   engines without svh — on desktop all three resolve to the same height. */
+.story-viewport {
+  height: 100vh;
+  height: 100dvh;
+  height: 100svh;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ── Per-chapter image focal points ──
+   Each scene sets --focal-desktop and --focal-mobile, so a chapter's crop can be
+   tweaked from the data file without touching layout code. Tablet and split
+   layouts keep the desktop crop (the subject stays opposite the text); phones
+   swap to the portrait crop. */
+.scene-image--focal {
+  object-position: var(--focal-desktop, center);
+}
+
+@media (max-width: 640px) {
+  .scene-image--focal {
+    object-position: var(--focal-mobile, var(--focal-desktop, center));
+  }
+}
+
+@keyframes story-hint-rise {
+  0% {
+    transform: translateY(5px);
+    opacity: 0;
+  }
+  45% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
+.story-swipe-chevron {
+  animation: story-hint-rise 1.9s ease-in-out infinite;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
