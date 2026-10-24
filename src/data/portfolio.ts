@@ -88,7 +88,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['web'],
-    url: '', // TODO: add the live site URL
+    url: 'https://cultur.fm/',
     repo: '',
     images: ['/projects/cultur-fm/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -108,7 +108,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['web', 'ecommerce'],
-    url: '', // TODO: add the live storefront URL
+    url: 'https://culturalwayswins.com/',
     repo: '',
     images: ['/projects/cultur-always-wins/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -128,7 +128,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['web', 'ecommerce'],
-    url: '', // TODO: add the live site URL
+    url: 'https://wholesale.dellahshair.com/',
     repo: '',
     images: ['/projects/wholesale-dellahs/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -148,7 +148,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['web'],
-    url: '', // TODO: add the live site URL
+    url: 'https://blog.dellahshair.com/',
     repo: '',
     images: ['/projects/blog-dellahs/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -168,7 +168,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['ecommerce'],
-    url: '', // TODO: add the live site URL
+    url: 'https://www.dellahshair.com/',
     repo: '',
     images: ['/projects/dellahs-raw-hair/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -184,11 +184,11 @@ export const portfolioProjects: PortfolioProject[] = [
     description: 'Procurement platform connecting corporate buyers with suppliers.',
     longDescription:
       'A procurement technology platform built around corporate buyers, suppliers and competitive procurement workflows. Work includes procurement interfaces, vendor experiences, RFQ flows, product and fleet inventory, competitive bidding concepts and API-driven dashboards.',
-    year: 2025, // TODO: confirm year
-    status: 'in-progress',
+    year: 2025,
+    status: 'live',
     type: 'client',
     categories: ['web'],
-    url: '', // TODO: add the live URL
+    url: 'https://constantflow-procurement.com/',
     repo: '',
     images: ['/projects/constant-flow/cover.png'], // TODO: replace with a real capture
     stack: {
@@ -209,7 +209,7 @@ export const portfolioProjects: PortfolioProject[] = [
     status: 'live',
     type: 'client',
     categories: ['ecommerce'],
-    url: '', // TODO: add the live store URL
+    url: 'https://www.myneighborrentals.com/',
     repo: '',
     images: ['/projects/my-neighbor/cover.png'], // TODO: replace with a real capture
     stack: {

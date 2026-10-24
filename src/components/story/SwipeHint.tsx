@@ -33,7 +33,9 @@ const VARIANTS = {
 } as const satisfies Record<SwipeHintVariant, { position: string; align: string; label: string }>
 
 export function SwipeHint({ variant, visible }: SwipeHintProps) {
-  const isTouch = usePointerType() === 'touch'
+  // If we are in the top-right variant (stacked mobile layout), we favor the
+  // swipe instruction even if pointer detection is ambiguous (e.g. simulators).
+  const isTouch = usePointerType() === 'touch' || variant === 'top-right'
   const { position, align, label } = VARIANTS[variant]
 
   return (

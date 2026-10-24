@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { gsap } from 'gsap'
 import { useForm } from '@formspree/react'
+import { MobileMenu } from '../components/nav/MobileMenu'
+import { useSEO } from '../hooks/useSEO'
 
 export function MessagePage() {
   const [state, handleSubmit] = useForm('xdeoqzdj')
@@ -9,6 +11,8 @@ export function MessagePage() {
   const pageRef = useRef<HTMLDivElement>(null)
 
   const currentYear = new Date().getFullYear()
+
+  useSEO('message')
 
   // Page entry animation
   useEffect(() => {
@@ -81,15 +85,16 @@ export function MessagePage() {
           >
             ← BACK
           </Link>
-          <div className="hidden sm:flex items-start gap-16 lg:gap-24">
+          <div className="hidden md:flex items-start gap-16 lg:gap-24">
             <div className="text-sm text-cream/60">{currentYear}</div>
-            <nav className="flex flex-col gap-0.5 text-sm">
+            <nav aria-label="Primary" className="flex flex-col gap-0.5 text-sm">
               <Link to="/story" className="text-left text-cream/60 hover:text-cream duration-300">Story</Link>
               <Link to="/jobs" className="text-left text-cream/60 hover:text-cream duration-300">Jobs</Link>
               <Link to="/skills" className="text-left text-cream/60 hover:text-cream duration-300">Skills</Link>
               <span className="text-left text-cream">Message</span>
             </nav>
           </div>
+          <MobileMenu activeLabel="Message" tone="cream" showSocial />
         </header>
 
         {/* Success Content */}
@@ -151,9 +156,9 @@ export function MessagePage() {
         >
           ← BACK
         </Link>
-        <div className="hidden sm:flex items-start gap-16 lg:gap-24">
+        <div className="hidden md:flex items-start gap-16 lg:gap-24">
           <div className="font-hn text-sm text-cream/60">{currentYear}</div>
-          <nav className="flex flex-col gap-0.5 text-sm">
+          <nav aria-label="Primary" className="flex flex-col gap-0.5 text-sm">
             <Link to="/story" className="text-left text-cream/60 hover:text-cream duration-300">Story</Link>
             <Link to="/jobs" className="text-left text-cream/60 hover:text-cream duration-300">Jobs</Link>
             <Link to="/skills" className="text-left text-cream/60 hover:text-cream duration-300">Skills</Link>
@@ -163,6 +168,7 @@ export function MessagePage() {
             </span>
           </nav>
         </div>
+        <MobileMenu activeLabel="Message" tone="cream" showSocial />
       </header>
 
       {/* Main Content */}

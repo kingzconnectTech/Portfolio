@@ -1,22 +1,22 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { X } from 'lucide-react'
 import kingzconnectPortrait from '../assets/Kingzconnect.png'
 import logoSrc from '../assets/Logo.png'
 import { projects } from '../data/projects'
-
-const navLinks = ['Story', 'Jobs', 'Skills', 'Message'] as const
-const socialLinks = ['Instagram', 'TikTok', 'LinkedIn']
+import { NAV_ITEMS, SOCIAL_LINKS } from '../data/nav'
+import { MobileMenu } from '../components/nav/MobileMenu'
+import { useSEO } from '../hooks/useSEO'
 
 type Overlay = 'none' | 'projects'
 
 export function HomePage() {
-  const [drawerOpen, setDrawerOpen] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>('none')
   const currentYear = new Date().getFullYear()
 
+  useSEO('home')
+
   useEffect(() => {
-    if (drawerOpen || overlay !== 'none') {
+    if (overlay !== 'none') {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
@@ -24,22 +24,11 @@ export function HomePage() {
     return () => {
       document.body.style.overflow = ''
     }
-  }, [drawerOpen, overlay])
-
-  const handleNav = useCallback(
-    (link: (typeof navLinks)[number]) => {
-      if (link === 'Story' || link === 'Message' || link === 'Jobs' || link === 'Skills') {
-        // Story, Message, Jobs, and Skills are now separate routes, handled by Link
-        return
-      }
-      setDrawerOpen(false)
-    },
-    [],
-  )
+  }, [overlay])
 
   return (
     <>
-      <section className="relative h-[100dvh] w-full overflow-hidden bg-black">
+      <section className="viewport-fill relative w-full overflow-hidden bg-black">
         {/* BG image - default z */}
         <img
           alt=""
@@ -82,206 +71,58 @@ export function HomePage() {
           </div>
         </footer>
 
-        {/* Front portrait - z-20, pointer-events none */}
+        {/* Front portrait - z-20, pointer-events none.
+            Centred with auto margins rather than a translate: the rise-in keyframes
+            animate `transform`, and with fill-mode `both` they would overwrite a
+            translate utility once the animation finished. */}
         <img
           alt="Portrait"
           src={kingzconnectPortrait}
-          className="absolute left-1/2 bottom-0 -translate-x-1/2 z-20 h-auto w-[86%] sm:w-[82%] max-h-[100%] sm:max-h-[100%] object-contain object-bottom pointer-events-none anim-rise-in"
+          className="absolute inset-x-0 bottom-16 sm:bottom-0 z-20 mx-auto h-auto w-[86%] sm:w-[82%] max-h-[100%] sm:max-h-[100%] object-contain object-bottom pointer-events-none anim-rise-in"
           style={{ animationDelay: '300ms' }}
         />
 
         {/* Header - z-30 */}
         <header className="absolute inset-x-0 top-0 z-30 flex items-start justify-between px-6 pt-6 sm:px-10 sm:pt-8">
           <a href="#" className="anim-fade-up" style={{ animationDelay: '800ms' }}>
-            <img src={logoSrc} alt="Marcus — Bennet" className="h-9 sm:h-11 w-auto object-contain" />
+            <img src={logoSrc} alt="kingzconnect" className="h-9 sm:h-11 w-auto object-contain" />
           </a>
 
-          <div className="hidden sm:flex items-start gap-16 lg:gap-24">
+          <div className="hidden md:flex items-start gap-16 lg:gap-24">
             <div className="text-sm text-cream anim-fade-up" style={{ animationDelay: '900ms' }}>
               {currentYear}
             </div>
-            <nav className="flex flex-col gap-0.5 text-sm">
-              {navLinks.map((link, i) => {
-                const routeMap: Record<string, string> = {
-                  'Story': '/story',
-                  'Message': '/message',
-                  'Jobs': '/jobs',
-                  'Skills': '/skills'
-                }
-                
-                return routeMap[link] ? (
-                  <Link
-                    key={link}
-                    to={routeMap[link]}
-                    className="text-left text-cream opacity-100 hover:opacity-60 duration-300 anim-fade-up"
-                    style={{ animationDelay: `${1000 + i * 80}ms` }}
-                  >
-                    {link}
-                  </Link>
-                ) : (
-                  <button
-                    key={link}
-                    type="button"
-                    onClick={() => handleNav(link)}
-                    className="text-left text-cream opacity-100 hover:opacity-60 duration-300 anim-fade-up"
-                    style={{ animationDelay: `${1000 + i * 80}ms` }}
-                  >
-                    {link}
-                  </button>
-                )
-              })}
+            <nav aria-label="Primary" className="flex flex-col gap-0.5 text-sm">
+              {NAV_ITEMS.map((item, i) => (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  className="text-left text-cream opacity-100 hover:opacity-60 duration-300 anim-fade-up"
+                  style={{ animationDelay: `${1000 + i * 80}ms` }}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </nav>
-            <nav className="flex flex-col gap-0.5 text-sm">
-              {socialLinks.map((link, i) => (
+            <nav aria-label="Social" className="flex flex-col gap-0.5 text-sm">
+              {SOCIAL_LINKS.map((link, i) => (
                 <a
-                  key={link}
-                  href="#"
+                  key={link.label}
+                  href={link.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-cream opacity-100 hover:opacity-60 duration-300 anim-fade-up"
                   style={{ animationDelay: `${1150 + i * 80}ms` }}
                 >
-                  {link}
+                  {link.label}
                 </a>
               ))}
             </nav>
           </div>
 
-          <button
-            aria-label={drawerOpen ? 'Close menu' : 'Open menu'}
-            onClick={() => setDrawerOpen(!drawerOpen)}
-            className="sm:hidden z-50 relative h-10 w-10 flex items-center justify-center anim-fade-up"
-            style={{ animationDelay: '900ms' }}
-          >
-            <div className="relative h-4 w-6 flex flex-col justify-between">
-              <span
-                className="block h-[2px] w-full bg-cream transition-transform duration-500 origin-center"
-                style={{
-                  transform: drawerOpen ? 'translateY(7px) rotate(45deg)' : 'translateY(0) rotate(0)',
-                  transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
-                }}
-              />
-              <span
-                className="block h-[2px] w-full bg-cream transition-opacity duration-300"
-                style={{ opacity: drawerOpen ? 0 : 1 }}
-              />
-              <span
-                className="block h-[2px] w-full bg-cream transition-transform duration-500 origin-center"
-                style={{
-                  transform: drawerOpen ? 'translateY(-7px) rotate(-45deg)' : 'translateY(0) rotate(0)',
-                  transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)',
-                }}
-              />
-            </div>
-          </button>
+          <MobileMenu tone="cream" showSocial />
         </header>
 
-        <div
-          className={`sm:hidden fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity duration-500 ${
-            drawerOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
-          onClick={() => setDrawerOpen(false)}
-        />
-
-        <aside
-          className={`sm:hidden fixed top-0 right-0 z-40 w-[80%] max-w-sm h-full bg-[#141414] px-8 py-10 transition-transform duration-[600ms] ${
-            drawerOpen ? 'translate-x-0' : 'translate-x-full'
-          }`}
-          style={{ transitionTimingFunction: 'cubic-bezier(0.76, 0, 0.24, 1)' }}
-        >
-          <button
-            aria-label="Close menu"
-            onClick={() => setDrawerOpen(false)}
-            className="absolute right-6 top-6 z-50 text-cream transition-all duration-500"
-            style={{
-              opacity: drawerOpen ? 1 : 0,
-              transform: drawerOpen ? 'rotate(0deg)' : 'rotate(90deg)',
-              transitionDelay: drawerOpen ? '300ms' : '0ms',
-            }}
-          >
-            <X size={26} strokeWidth={1.5} />
-          </button>
-
-          <div className="mt-10">
-            <div
-              className="uppercase tracking-[0.2em] text-cream/50 text-xs mb-6 transition-all duration-500"
-              style={{
-                opacity: drawerOpen ? 1 : 0,
-                transform: drawerOpen ? 'translateY(0)' : 'translateY(12px)',
-                transitionDelay: drawerOpen ? '250ms' : '0ms',
-              }}
-            >
-              Site Index
-            </div>
-            <nav className="flex flex-col gap-2">
-              {navLinks.map((link, i) => {
-                const routeMap: Record<string, string> = {
-                  'Story': '/story',
-                  'Message': '/message',
-                  'Jobs': '/jobs',
-                  'Skills': '/skills'
-                }
-                
-                return routeMap[link] ? (
-                  <Link
-                    key={link}
-                    to={routeMap[link]}
-                    onClick={() => setDrawerOpen(false)}
-                    className="text-left font-hn text-4xl text-cream transition-all duration-500"
-                    style={{
-                      opacity: drawerOpen ? 1 : 0,
-                      transform: drawerOpen ? 'translateY(0)' : 'translateY(24px)',
-                      transitionDelay: drawerOpen ? `${300 + i * 80}ms` : '0ms',
-                    }}
-                  >
-                    {link}
-                  </Link>
-                ) : (
-                  <button
-                    key={link}
-                    type="button"
-                    onClick={() => handleNav(link)}
-                    className="text-left font-hn text-4xl text-cream transition-all duration-500"
-                    style={{
-                      opacity: drawerOpen ? 1 : 0,
-                      transform: drawerOpen ? 'translateY(0)' : 'translateY(24px)',
-                      transitionDelay: drawerOpen ? `${300 + i * 80}ms` : '0ms',
-                    }}
-                  >
-                    {link}
-                  </button>
-                )
-              })}
-            </nav>
-          </div>
-
-          <div className="mt-14">
-            <div
-              className="uppercase tracking-[0.2em] text-cream/50 text-xs mb-5 transition-all duration-500"
-              style={{
-                opacity: drawerOpen ? 1 : 0,
-                transform: drawerOpen ? 'translateY(0)' : 'translateY(12px)',
-                transitionDelay: drawerOpen ? '500ms' : '0ms',
-              }}
-            >
-              Find Me
-            </div>
-            <nav className="flex flex-wrap gap-x-6 gap-y-3">
-              {socialLinks.map((link, i) => (
-                <a
-                  key={link}
-                  href="#"
-                  className="font-hn text-sm text-cream transition-all duration-500"
-                  style={{
-                    opacity: drawerOpen ? 1 : 0,
-                    transform: drawerOpen ? 'translateY(0)' : 'translateY(16px)',
-                    transitionDelay: drawerOpen ? `${550 + i * 60}ms` : '0ms',
-                  }}
-                >
-                  {link}
-                </a>
-              ))}
-            </nav>
-          </div>
-        </aside>
       </section>
 
       {/* Lightweight projects bridge — Story CTA lands here until a full Projects experience exists */}

@@ -26,6 +26,17 @@ html, body, #root {
     font-family: 'Weghorst Italic', 'Helvetica Neue ME', Helvetica, Arial, sans-serif;
     font-style: italic;
   }
+  /* ── Full-viewport sections ──
+     svh is the stable baseline: it matches the viewport with mobile browser chrome
+     visible, so anything anchored to the bottom edge stays on screen. Plain
+     dvh/vh can resolve taller than the document's containing block on phones,
+     which pushes a bottom-anchored element behind the URL bar. vh/dvh are kept
+     as fallbacks and are identical to svh on desktop. */
+  .viewport-fill {
+    height: 100vh;
+    height: 100dvh;
+    height: 100svh;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

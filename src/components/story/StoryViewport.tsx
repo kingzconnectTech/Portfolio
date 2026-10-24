@@ -2,6 +2,7 @@ import { forwardRef } from 'react'
 import { Link } from 'react-router-dom'
 import type { CinematicScene } from '../../data/story-cinematic'
 import { useIsDesktop, useIsLandscape, useIsTabletUp } from '../../hooks/useMediaQuery'
+import { MobileMenu } from '../nav/MobileMenu'
 import { ChapterProgress } from './ChapterProgress'
 import { StoryScene } from './StoryScene'
 import { SwipeHint, type SwipeHintVariant } from './SwipeHint'
@@ -78,24 +79,17 @@ export const StoryViewport = forwardRef<HTMLDivElement, StoryViewportProps>(
         {/* ── Chapter Progress (reflowed layouts only) ── */}
         {!isDesktop && <ChapterProgress index={activeSceneIndex} total={totalScenes} />}
 
-        {/* ── Fixed Global Minimal Navigation (Stays fixed at all times) ── */}
         <header
-          className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between pointer-events-none ${
-            isDesktop ? 'px-6 py-6 sm:px-10 sm:py-8' : 'px-5 sm:px-10'
-          }`}
-          style={
-            isDesktop
-              ? undefined
-              : {
-                  paddingTop: 'max(16px, env(safe-area-inset-top))',
-                  paddingBottom: '16px',
-                }
-          }
+          className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-5 sm:px-10 pointer-events-none`}
+          style={{
+            paddingTop: isDesktop ? '32px' : 'max(16px, env(safe-area-inset-top))',
+            paddingBottom: '16px',
+          }}
         >
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-6 pointer-events-auto">
             <Link
               to="/"
-              className={`pointer-events-auto font-hn tracking-[0.26em] text-cream font-semibold flex items-center gap-2 transition-opacity duration-300 text-xs sm:text-sm ${
+              className={`font-hn tracking-[0.26em] text-cream font-semibold flex items-center gap-2 transition-opacity duration-300 text-xs sm:text-sm ${
                 isDesktop
                   ? 'hover:text-white hover:opacity-75'
                   : '-ml-2.5 min-h-[44px] min-w-[44px] rounded-full bg-black/35 px-2.5 backdrop-blur-[2px] hover:text-white active:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60'
@@ -105,6 +99,15 @@ export const StoryViewport = forwardRef<HTMLDivElement, StoryViewportProps>(
               ← BACK
             </Link>
           </div>
+
+          {/* Mobile Menu — visible for every non-desktop composition */}
+          <MobileMenu
+            activeLabel="Story"
+            tone="white"
+            showSocial
+            visibilityClass={isDesktop ? 'hidden' : ''}
+            className="pointer-events-auto"
+          />
         </header>
 
         {/* ── Gesture Hint (Scene 00 Only) ── */}

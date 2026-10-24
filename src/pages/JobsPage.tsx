@@ -5,6 +5,8 @@ import type { CategoryId, PortfolioProject } from '../data/portfolio'
 import { projectsByCategory, populatedCategories } from '../data/portfolio'
 import { ProjectCard } from '../components/jobs/ProjectCard'
 import { ProjectModal } from '../components/jobs/ProjectModal'
+import { MobileMenu } from '../components/nav/MobileMenu'
+import { useSEO } from '../hooks/useSEO'
 
 interface OpenEntry {
   project: PortfolioProject
@@ -20,6 +22,8 @@ export function JobsPage() {
   const triggerRef = useRef<HTMLElement | null>(null)
 
   const currentYear = new Date().getFullYear()
+
+  useSEO('jobs')
 
   // Only categories that actually contain work get a section and a filter button.
   const filters = useMemo(
@@ -52,11 +56,6 @@ export function JobsPage() {
     tl.fromTo(pageRef.current,
       { opacity: 0 },
       { opacity: 1, duration: 0.8 }
-    )
-    .fromTo('.jobs-label',
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.6 },
-      '-=0.4'
     )
     .fromTo('.hero-headline',
       { opacity: 0, y: 40 },
@@ -106,13 +105,10 @@ export function JobsPage() {
           >
             ← BACK
           </Link>
-          <div className="jobs-label font-hn text-[10px] tracking-[0.34em] text-white/60">
-            JOBS / 01
-          </div>
         </div>
-        <div className="hidden sm:flex items-start gap-16 lg:gap-24 pointer-events-auto">
+        <div className="hidden md:flex items-start gap-16 lg:gap-24 pointer-events-auto">
           <div className="font-hn text-sm text-white/60">{currentYear}</div>
-          <nav className="flex flex-col gap-0.5 text-sm">
+          <nav aria-label="Primary" className="flex flex-col gap-0.5 text-sm">
             <Link to="/story" className="text-left text-white/60 hover:text-white duration-300">Story</Link>
             <span className="text-left text-white relative">
               Jobs
@@ -122,6 +118,7 @@ export function JobsPage() {
             <Link to="/message" className="text-left text-white/60 hover:text-white duration-300">Message</Link>
           </nav>
         </div>
+        <MobileMenu activeLabel="Jobs" tone="white" showSocial className="pointer-events-auto" />
       </header>
 
       {/* Main Content */}

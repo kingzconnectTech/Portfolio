@@ -118,7 +118,7 @@ function getLayoutClasses(layout: 'split' | 'stacked', isShort: boolean): Layout
 function getStackedGradient(isShort: boolean): string {
   return isShort
     ? 'linear-gradient(to top, rgba(12,12,12,0.94) 0%, rgba(12,12,12,0.9) 45%, rgba(12,12,12,0.55) 62%, transparent 72%)'
-    : 'linear-gradient(to top, rgba(12,12,12,0.92) 0%, rgba(12,12,12,0.88) 20%, rgba(12,12,12,0.52) 30%, transparent 36%)'
+    : 'linear-gradient(to top, rgba(12,12,12,0.95) 0%, rgba(12,12,12,0.9) 25%, rgba(12,12,12,0.6) 40%, transparent 48%)'
 }
 
 export interface StorySceneProps {
@@ -154,8 +154,8 @@ export const StoryScene = forwardRef<HTMLDivElement, StorySceneProps>(function S
   // below the fixed header and scrolls internally only if a dense chapter still
   // does not fit. The bottom padding keeps text clear of browser chrome.
   const blockClasses =
-    'max-h-[calc(100%_-_96px)] overflow-y-auto overscroll-contain scrollbar-hide'
-  const blockBottomPadding = 'max(32px, calc(env(safe-area-inset-bottom, 0px) + 12px))'
+    'max-h-[calc(100%_-_120px)] overflow-y-auto overscroll-contain scrollbar-hide'
+  const blockBottomPadding = 'max(64px, calc(env(safe-area-inset-bottom, 0px) + 24px))'
   const blockStyle: CSSProperties = { touchAction: 'pan-y' }
 
   // Per-chapter focal points, consumed by `.scene-image--focal`.

@@ -3,6 +3,7 @@ import { gsap } from 'gsap'
 import { cinematicScenes, TOTAL_SCENES } from '../data/story-cinematic'
 import { StoryViewport } from '../components/story/StoryViewport'
 import { BREAKPOINTS, useMediaQuery } from '../hooks/useMediaQuery'
+import { useSEO } from '../hooks/useSEO'
 
 const WHEEL_THRESHOLD = 40
 /** Deliberate swipe distance (px) before a chapter change. */
@@ -15,6 +16,8 @@ export function StoryPage() {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0)
   const [outgoingSceneIndex, setOutgoingSceneIndex] = useState<number | null>(null)
   const [reducedMotion, setReducedMotion] = useState(false)
+
+  useSEO('story')
 
   // Phones get shorter, snappier entrances.
   const isCompact = !useMediaQuery(BREAKPOINTS.tablet)

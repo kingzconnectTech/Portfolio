@@ -15,6 +15,7 @@ export default {
         sans: ['"Helvetica Neue ME"', 'Helvetica', 'Arial', 'sans-serif'],
         serif: ['Georgia', 'serif'],
         poppins: ['Poppins', 'sans-serif'],
+        inter: ['Inter', '"Helvetica Neue ME"', 'Helvetica', 'Arial', 'sans-serif'],
       },
       keyframes: {
         'fade-in': {
