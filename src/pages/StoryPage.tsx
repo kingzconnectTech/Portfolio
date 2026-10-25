@@ -221,6 +221,13 @@ export function StoryPage() {
           tl.fromTo(incomingEl, { opacity: 0 }, { opacity: 1, duration: t.media }, 0)
         }
 
+        // Bring the photograph back up. The media layer is set to opacity 0 above,
+        // so without this tween it never becomes visible again and every scene
+        // after the first cross-dissolve shows only the overlays and the text.
+        if (incomingMedia) {
+          tl.to(incomingMedia, { opacity: 1, duration: t.media, clearProps: 'opacity' }, 0)
+        }
+
         // Fade in incoming overlay
         if (incomingOverlay) {
           tl.to(incomingOverlay, { opacity: 1, duration: t.overlay }, t.cOverlay)
