@@ -40,6 +40,11 @@ export const PAGE_SEO = {
     description:
       'Have an idea, a project or a role in mind? Start a conversation about what to build next.',
   },
+  notFound: {
+    title: 'Page not found — KingzConnect',
+    description:
+      'The page you were looking for does not exist. Head back to KingzConnect to start again.',
+  },
 } as const satisfies Record<string, SeoCopy>
 
 export type SeoPage = keyof typeof PAGE_SEO

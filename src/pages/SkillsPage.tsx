@@ -259,7 +259,6 @@ export function SkillsPage() {
           <nav aria-label="Primary" className="flex flex-col gap-0.5 text-xs sm:text-sm">
             <Link to="/story" className="text-left text-white/60 hover:text-white duration-300">Story</Link>
             <Link to="/jobs" className="text-left text-white/60 hover:text-white duration-300">Jobs</Link>
-            <Link to="/projects" className="text-left text-white/60 hover:text-white duration-300">Projects</Link>
             <span className="text-left text-white relative">
               Skills
               <span className="absolute bottom-0 left-0 right-0 h-px bg-white" />
